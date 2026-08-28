@@ -1,0 +1,24 @@
+name: Feature proposal
+description: Propose a framework-neutral trust or security capability
+title: "[Proposal]: "
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Trust problem
+      description: Describe the verification or security gap independently of a preferred implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Expected evidence and verdict
+      description: What observable evidence should be collected, and what would constitute pass or fail?
+    validations:
+      required: true
+  - type: textarea
+    id: frameworks
+    attributes:
+      label: Framework impact
+      description: Which adapters or framework-neutral contracts are affected?

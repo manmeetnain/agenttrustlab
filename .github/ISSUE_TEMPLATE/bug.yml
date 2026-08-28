@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible AgentTrustLab defect
+title: "[Bug]: "
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: Do not report vulnerabilities here. Use GitHub's private vulnerability reporting flow.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include a minimal suite, command, report excerpt and traceback with secrets removed.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: AgentTrustLab version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Python, OS and framework
+    validations:
+      required: true

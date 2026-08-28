@@ -4,24 +4,24 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 
 ## [Unreleased]
 
-### Added
-
-- Standards registry and explicit community release profiles
-- Deterministic prompt-injection, exfiltration and memory-poisoning attack cases
-- State snapshots and rollback invariant verification
-- Canonical SHA-256 evidence manifests with optional HMAC signatures
-- Local-first FastAPI trust cockpit and `agenttrust serve`
-- Ed25519 evidence signing, verification and protected API ingestion
-- Non-root read-only container deployment and container health CI
+No changes yet.
 
 ## [0.1.0] - 2026-08-28
 
 ### Added
 
 - Typed verification contracts and deterministic execution engine
-- Plain-Python and OpenAI Agents SDK adapters
+- Plain Python, OpenAI Agents, LangGraph, CrewAI, AutoGen, Pydantic AI,
+  Google ADK, smolagents and MCP adapters with shared conformance tests
 - Simulated tools, safety policies, scoring, CLI and pytest integration
 - JSON/HTML reports, documentation, examples, property tests and release automation
+- Standards registry and explicit community release profiles
+- Deterministic OWASP Agentic Top 10 and MITRE ATLAS-aligned attack cases
+- State snapshots and rollback invariant verification
+- Canonical SHA-256 evidence manifests with HMAC and Ed25519 signatures
+- Local-first FastAPI evidence explorer and `agenttrust serve`
+- Protected API ingestion, SQLite report history and data-driven web dashboard
+- Non-root read-only container deployment and container health CI
 
 [Unreleased]: https://github.com/manmeetnain/agenttrustlab/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/manmeetnain/agenttrustlab/releases/tag/v0.1.0

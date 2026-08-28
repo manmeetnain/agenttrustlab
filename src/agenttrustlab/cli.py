@@ -19,6 +19,7 @@ from agenttrustlab.engine import EvaluationEngine
 from agenttrustlab.evidence import create_manifest
 from agenttrustlab.profiles import COMMUNITY_BALANCED, COMMUNITY_HIGH_IMPACT
 from agenttrustlab.reporting import write_html, write_json
+from agenttrustlab.storage import ReportStore
 from agenttrustlab.verdicts import GateStatus, evaluate_release
 
 app = typer.Typer(help="Independent verification for AI agents.", no_args_is_help=True)
@@ -45,6 +46,7 @@ def run(
     profile: str = typer.Option("balanced", help="Release policy: balanced or high-impact."),
     manifest: Path = typer.Option(Path("agenttrust-manifest.json")),
     baseline: Path | None = typer.Option(None, exists=True, dir_okay=False),
+    store: Path | None = typer.Option(None, help="Persist the report to a dashboard SQLite DB."),
 ) -> None:
     """Run a Python evaluation suite."""
     agent, cases = _load_suite(suite)
@@ -61,6 +63,8 @@ def run(
     )
     write_json(report, json_report)
     write_html(report, html_report)
+    if store:
+        ReportStore(store).put(report)
     evidence = create_manifest(
         report,
         policy_profile=f"{selected_profile.name}@{selected_profile.version}",

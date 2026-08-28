@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import inspect
+import json
 from collections.abc import Awaitable, Callable
 from typing import Any, Protocol, runtime_checkable
 
-from agenttrustlab.contracts import AgentResult, EvaluationCase
+from agenttrustlab.contracts import AgentResult, EvaluationCase, ToolCall, ToolResult
 from agenttrustlab.tools import ToolRegistry
 
 
@@ -59,4 +60,58 @@ class OpenAIAgentsAdapter:
         del tools  # SDK tools belong to the wrapped agent; traces are normalized below.
         run = await self.runner.run(self.agent, case.prompt)
         output = str(run.final_output)
-        return AgentResult(output=output, metadata={"sdk_result_type": type(run).__name__})
+        calls: list[ToolCall] = []
+        results: list[ToolResult] = []
+        for item in run.new_items:
+            item_type = getattr(item, "type", "")
+            if item_type == "tool_call_item":
+                raw = item.raw_item
+                raw_arguments = (
+                    raw.get("arguments", {})
+                    if isinstance(raw, dict)
+                    else getattr(raw, "arguments", {})
+                )
+                if isinstance(raw_arguments, str):
+                    try:
+                        arguments = json.loads(raw_arguments)
+                    except json.JSONDecodeError:
+                        arguments = {"_raw": raw_arguments}
+                elif isinstance(raw_arguments, dict):
+                    arguments = dict(raw_arguments)
+                else:
+                    arguments = {"_value": raw_arguments}
+                calls.append(
+                    ToolCall(
+                        id=str(item.call_id or f"call-{len(calls)}"),
+                        name=str(item.tool_name or "unknown"),
+                        arguments=arguments,
+                    )
+                )
+            elif item_type == "tool_call_output_item":
+                results.append(
+                    ToolResult(
+                        call_id=str(item.call_id or f"call-{len(results)}"),
+                        output=item.output,
+                    )
+                )
+        usage = {
+            "requests": sum(response.usage.requests for response in run.raw_responses),
+            "input_tokens": sum(response.usage.input_tokens for response in run.raw_responses),
+            "output_tokens": sum(response.usage.output_tokens for response in run.raw_responses),
+            "total_tokens": sum(response.usage.total_tokens for response in run.raw_responses),
+        }
+        metadata = {
+            "sdk_result_type": type(run).__name__,
+            "usage": usage,
+            "input_guardrails": len(run.input_guardrail_results),
+            "output_guardrails": len(run.output_guardrail_results),
+            "tool_input_guardrails": len(run.tool_input_guardrail_results),
+            "tool_output_guardrails": len(run.tool_output_guardrail_results),
+            "interruptions": len(getattr(run, "interruptions", ())),
+        }
+        return AgentResult(
+            output=output,
+            tool_calls=tuple(calls),
+            tool_results=tuple(results),
+            metadata=metadata,
+        )

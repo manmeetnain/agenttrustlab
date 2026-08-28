@@ -38,8 +38,11 @@ def test_cli_end_to_end(tmp_path) -> None:
             str(tmp_path / "x.html"),
             "--manifest",
             str(tmp_path / "manifest.json"),
+            "--store",
+            str(tmp_path / "reports.db"),
         ],
     )
     assert result.exit_code == 0, result.output
     assert (tmp_path / "x.html").exists()
     assert (tmp_path / "manifest.json").exists()
+    assert (tmp_path / "reports.db").exists()

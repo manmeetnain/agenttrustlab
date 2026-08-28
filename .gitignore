@@ -10,5 +10,5 @@ build/
 dist/
 site/
 *.egg-info/
+*.db
 agenttrust-report.*
-

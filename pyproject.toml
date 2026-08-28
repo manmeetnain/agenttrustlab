@@ -1,0 +1,89 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agenttrustlab"
+version = "0.1.0"
+description = "Pytest for AI agents: framework-neutral correctness, safety, and trust evaluation."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.11"
+authors = [{name = "Manmeet Nain"}]
+maintainers = [{name = "Manmeet Nain"}]
+keywords = ["ai-agents", "evaluation", "security", "testing", "pytest"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Pytest",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = [
+  "pydantic>=2.7,<3",
+  "typer>=0.12,<1",
+  "rich>=13.7,<15",
+]
+
+[project.optional-dependencies]
+openai = ["openai-agents>=0.2"]
+otel = ["opentelemetry-api>=1.25", "opentelemetry-sdk>=1.25"]
+server = ["fastapi>=0.115", "uvicorn>=0.30"]
+dev = [
+  "agenttrustlab[openai,otel,server]",
+  "build>=1.2",
+  "hypothesis>=6.100",
+  "mypy>=1.10",
+  "pytest>=8.2",
+  "pytest-cov>=5",
+  "ruff>=0.6",
+]
+docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.25"]
+
+[project.scripts]
+agenttrust = "agenttrustlab.cli:app"
+
+[project.entry-points.pytest11]
+agenttrustlab = "agenttrustlab.pytest_plugin"
+
+[project.urls]
+Homepage = "https://github.com/manmeetnain/agenttrustlab"
+Documentation = "https://manmeetnain.github.io/agenttrustlab/"
+Issues = "https://github.com/manmeetnain/agenttrustlab/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agenttrustlab"]
+
+[tool.pytest.ini_options]
+# Avoid loading this project's own plugin before pytest-cov starts measuring it.
+addopts = "--strict-markers --strict-config -p no:agenttrustlab"
+testpaths = ["tests"]
+markers = ["agenttrust: agent trust verification case"]
+
+[tool.coverage.run]
+branch = true
+source = ["agenttrustlab"]
+omit = ["src/agenttrustlab/pytest_plugin.py"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/agenttrustlab/reporting.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["agenttrustlab"]

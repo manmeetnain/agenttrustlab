@@ -1,0 +1,18 @@
+site_name: AgentTrustLab
+site_description: Pytest for AI agents
+site_author: Manmeet Nain
+site_url: https://manmeetnain.github.io/agenttrustlab/
+repo_url: https://github.com/manmeetnain/agenttrustlab
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+    accent: blue
+  features: [navigation.instant, navigation.sections, content.code.copy]
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Threat model: threat-model.md
+  - Roadmap: roadmap.md
+

@@ -7,7 +7,8 @@ name = "agenttrustlab"
 version = "0.1.0"
 description = "Pytest for AI agents: framework-neutral correctness, safety, and trust evaluation."
 readme = "README.md"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
 authors = [{name = "Manmeet Nain"}]
 maintainers = [{name = "Manmeet Nain"}]

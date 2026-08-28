@@ -47,7 +47,8 @@ The web product remains local-first: reports, policies and evidence do not requi
 
 - Strict, versionable Pydantic contracts
 - Seeded, time-bounded deterministic execution
-- Plain-Python adapter and optional OpenAI Agents SDK adapter
+- Plain Python, OpenAI Agents SDK, LangGraph, CrewAI, AutoGen, Pydantic AI,
+  Google ADK, smolagents and MCP adapters
 - Side-effect-free simulated tool registry
 - Safety, injection, forbidden-tool, and protected-memory policies
 - Correctness, tool, evidence, cost, and latency scoring

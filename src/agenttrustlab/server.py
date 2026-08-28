@@ -8,7 +8,7 @@ from importlib.resources import files
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from agenttrustlab import __version__
 from agenttrustlab.attacks import BUILTIN_ATTACKS
@@ -32,10 +32,16 @@ def create_app(database: str | Path | None = None, api_token: str | None = None)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):  # type: ignore[no-untyped-def]
-        content_length = int(request.headers.get("content-length", "0"))
+        try:
+            content_length = int(request.headers.get("content-length", "0"))
+        except ValueError:
+            content_length = 0
         if content_length > 10 * 1024 * 1024:
-            raise HTTPException(status_code=413, detail="request body exceeds 10 MiB")
-        response = await call_next(request)
+            response = JSONResponse(
+                status_code=413, content={"detail": "request body exceeds 10 MiB"}
+            )
+        else:
+            response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"

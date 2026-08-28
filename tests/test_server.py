@@ -56,3 +56,15 @@ def test_report_api_token(tmp_path) -> None:
         ).status_code
         == 201
     )
+
+
+def test_server_rejects_oversized_body_with_security_headers(tmp_path) -> None:
+    client = TestClient(create_app(tmp_path / "limited.db"))
+    response = client.post(
+        "/api/reports",
+        content=b"{}",
+        headers={"content-length": str(10 * 1024 * 1024 + 1)},
+    )
+    assert response.status_code == 413
+    assert response.json()["detail"] == "request body exceeds 10 MiB"
+    assert response.headers["x-frame-options"] == "DENY"

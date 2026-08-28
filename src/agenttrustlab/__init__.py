@@ -13,18 +13,29 @@ from agenttrustlab.contracts import (
     ToolResult,
 )
 from agenttrustlab.engine import EvaluationEngine
-from agenttrustlab.framework_adapters import LangGraphAdapter, MCPAdapter, PydanticAIAdapter
+from agenttrustlab.framework_adapters import (
+    AutoGenAdapter,
+    CrewAIAdapter,
+    GoogleADKAdapter,
+    LangGraphAdapter,
+    MCPAdapter,
+    PydanticAIAdapter,
+    SmolagentsAdapter,
+)
 from agenttrustlab.policies import DefaultSafetyPolicy, PolicyDecision
 from agenttrustlab.tools import SimulatedTool, ToolRegistry
 
 __all__ = [
     "AgentAdapter",
     "AgentResult",
+    "AutoGenAdapter",
+    "CrewAIAdapter",
     "DefaultSafetyPolicy",
     "EvaluationCase",
     "EvaluationEngine",
     "EvaluationReport",
     "ExpectedOutcome",
+    "GoogleADKAdapter",
     "LangGraphAdapter",
     "MCPAdapter",
     "PlainPythonAdapter",
@@ -34,6 +45,7 @@ __all__ = [
     "RunStatus",
     "ScoreCard",
     "SimulatedTool",
+    "SmolagentsAdapter",
     "ToolCall",
     "ToolRegistry",
     "ToolResult",

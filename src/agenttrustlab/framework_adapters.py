@@ -6,7 +6,7 @@ Framework packages remain optional; adapters consume their public runtime shapes
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable
+from collections.abc import AsyncIterable, Callable
 from typing import Any
 
 from agenttrustlab.contracts import AgentResult, EvaluationCase
@@ -102,3 +102,76 @@ class MCPAdapter:
                 "is_error": bool(getattr(response, "isError", False)),
             },
         )
+
+
+class CrewAIAdapter:
+    """Evaluate a CrewAI ``Crew`` through its stable ``kickoff`` surface."""
+
+    name = "crewai"
+
+    def __init__(self, crew: Any, *, input_name: str = "prompt") -> None:
+        self.crew = crew
+        self.input_name = input_name
+
+    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult:
+        del tools
+        value = self.crew.kickoff(inputs={self.input_name: case.prompt})
+        if inspect.isawaitable(value):
+            value = await value
+        return AgentResult(
+            output=_content(getattr(value, "raw", value)), metadata={"framework": "crewai"}
+        )
+
+
+class AutoGenAdapter:
+    """Evaluate a modern AutoGen agent through ``run(task=...)``."""
+
+    name = "autogen"
+
+    def __init__(self, agent: Any) -> None:
+        self.agent = agent
+
+    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult:
+        del tools
+        value = self.agent.run(task=case.prompt)
+        if inspect.isawaitable(value):
+            value = await value
+        messages = getattr(value, "messages", ())
+        output = _content(messages[-1]) if messages else _content(value)
+        return AgentResult(output=output, metadata={"framework": "autogen"})
+
+
+class SmolagentsAdapter:
+    """Evaluate a smolagents agent through its ``run`` API."""
+
+    name = "smolagents"
+
+    def __init__(self, agent: Any) -> None:
+        self.agent = agent
+
+    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult:
+        del tools
+        value = self.agent.run(case.prompt)
+        if inspect.isawaitable(value):
+            value = await value
+        return AgentResult(output=_content(value), metadata={"framework": "smolagents"})
+
+
+class GoogleADKAdapter:
+    """Evaluate Google ADK via an application-owned asynchronous event stream."""
+
+    name = "google-adk"
+
+    def __init__(self, invoke: Callable[[str], AsyncIterable[Any]]) -> None:
+        self.invoke = invoke
+
+    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult:
+        del tools
+        parts: list[str] = []
+        async for event in self.invoke(case.prompt):
+            content = getattr(event, "content", None)
+            for part in getattr(content, "parts", ()):
+                text = _content(part)
+                if text:
+                    parts.append(text)
+        return AgentResult(output="\n".join(parts), metadata={"framework": "google-adk"})

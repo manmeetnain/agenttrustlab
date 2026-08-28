@@ -9,9 +9,13 @@ Adapters translate framework behavior into `AgentResult`; they never decide whet
 - LangGraph: asynchronous compiled-graph invocation with configurable input/output normalization.
 - Pydantic AI: asynchronous agent runs with output and usage preservation.
 - MCP: connected-session invocation of an MCP-exposed agent tool.
+- CrewAI: crew kickoff with normalized raw output.
+- AutoGen: task execution with normalized final messages.
+- Google ADK: session-owned asynchronous event streams with normalized text parts.
+- smolagents: synchronous or asynchronous agent runs.
 
 Every adapter must pass the shared conformance contract: non-empty identity, bounded invocation, normalized `AgentResult`, tool-call identity and failure isolation. Framework-specific details remain available as metadata while policies consume portable contracts.
 
-## Planned
+## Compatibility policy
 
-CrewAI, AutoGen, Google ADK and smolagents are the next compatibility tier. An adapter is not labelled supported until it passes conformance and trace-parity fixtures in CI.
+Adapters are duck typed so installing AgentTrustLab never installs an orchestration framework. Each supported surface passes the same conformance contract in CI. Optional real-framework integration matrices will be version-pinned as these ecosystems stabilize; their native objects remain the responsibility of the application that owns them.

@@ -1,3 +1,4 @@
+from agenttrustlab.attacks import BUILTIN_ATTACKS
 from agenttrustlab.profiles import COMMUNITY_BALANCED, COMMUNITY_HIGH_IMPACT, ReleaseProfile
 from agenttrustlab.standards import Framework, references_for
 
@@ -7,6 +8,11 @@ def test_standards_mapping_is_explicit() -> None:
     assert reference.framework == Framework.OWASP_AGENTIC_2026
     assert reference.control == "ASI01"
     assert references_for("unknown") == ()
+
+
+def test_every_builtin_attack_has_an_external_mapping() -> None:
+    unmapped = [attack.control for attack in BUILTIN_ATTACKS if not references_for(attack.control)]
+    assert unmapped == []
 
 
 def test_high_impact_profile_is_at_least_as_strict() -> None:

@@ -59,6 +59,25 @@ CONTROL_REFERENCES: dict[str, tuple[StandardReference, ...]] = {
             url="https://atlas.mitre.org/",
         ),
     ),
+    **{
+        control: (
+            StandardReference(
+                framework=Framework.OWASP_AGENTIC_2026,
+                control=identifier,
+                title=title,
+                url="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+            ),
+        )
+        for control, identifier, title in (
+            ("identity_privilege_abuse", "ASI03", "Identity & Privilege Abuse"),
+            ("agentic_supply_chain", "ASI04", "Agentic Supply Chain Vulnerabilities"),
+            ("unexpected_code_execution", "ASI05", "Unexpected Code Execution"),
+            ("insecure_inter_agent_communication", "ASI07", "Insecure Inter-Agent Communication"),
+            ("cascading_failures", "ASI08", "Cascading Failures"),
+            ("human_agent_trust_exploitation", "ASI09", "Human-Agent Trust Exploitation"),
+            ("rogue_agents", "ASI10", "Rogue Agents"),
+        )
+    },
 }
 
 

@@ -7,7 +7,7 @@ def test_server_health_catalog_and_dashboard(tmp_path) -> None:
     client = TestClient(create_app(tmp_path / "server.db"))
     assert client.get("/health").json()["status"] == "ok"
     catalog = client.get("/api/catalog").json()
-    assert len(catalog["attacks"]) == 3
+    assert len(catalog["attacks"]) == 11
     assert catalog["profiles"][0]["name"] == "community-balanced"
     response = client.get("/")
     assert response.status_code == 200

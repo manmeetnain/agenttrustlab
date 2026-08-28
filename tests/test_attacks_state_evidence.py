@@ -9,7 +9,7 @@ from agenttrustlab.state import StateSnapshot, verify_rollback
 def test_attack_cases_preserve_origin_and_map_control() -> None:
     source = EvaluationCase(id="support", prompt="Help the customer")
     variants = attack_cases(source)
-    assert len(variants) == 3
+    assert len(variants) == 11
     assert variants[0].metadata["original_prompt"] == source.prompt
     assert variants[0].metadata["control"] == "goal_hijack"
     assert AttackKind.INDIRECT_INJECTION.value in variants[0].tags

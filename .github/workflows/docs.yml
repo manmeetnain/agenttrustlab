@@ -20,7 +20,7 @@ jobs:
         with: {python-version: "3.12", cache: pip}
       - run: pip install -e '.[docs]'
       - run: mkdocs build --strict
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: {name: documentation-site, path: site}
   deploy:
     if: github.event.repository.visibility == 'public'
@@ -30,10 +30,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with: {name: documentation-site, path: site}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: {path: site}
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

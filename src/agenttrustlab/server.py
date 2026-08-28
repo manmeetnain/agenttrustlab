@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+import secrets
 from importlib.resources import files
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from agenttrustlab import __version__
@@ -17,7 +18,7 @@ from agenttrustlab.standards import CONTROL_REFERENCES
 from agenttrustlab.storage import ReportStore
 
 
-def create_app(database: str | Path | None = None) -> FastAPI:
+def create_app(database: str | Path | None = None, api_token: str | None = None) -> FastAPI:
     app = FastAPI(
         title="AgentTrustLab",
         description="Framework-neutral evidence and security verification for AI agents.",
@@ -27,6 +28,22 @@ def create_app(database: str | Path | None = None) -> FastAPI:
         database if database is not None else os.getenv("AGENTTRUST_DB", "agenttrustlab.db")
     )
     store = ReportStore(database_path)
+    write_token = api_token if api_token is not None else os.getenv("AGENTTRUST_API_TOKEN")
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next):  # type: ignore[no-untyped-def]
+        content_length = int(request.headers.get("content-length", "0"))
+        if content_length > 10 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="request body exceeds 10 MiB")
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "script-src 'self' 'unsafe-inline'; connect-src 'self'"
+        )
+        return response
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -47,7 +64,13 @@ def create_app(database: str | Path | None = None) -> FastAPI:
         }
 
     @app.post("/api/reports", status_code=201)
-    def ingest_report(report: EvaluationReport) -> dict[str, str]:
+    def ingest_report(
+        report: EvaluationReport, authorization: str | None = Header(default=None)
+    ) -> dict[str, str]:
+        if write_token:
+            supplied = authorization.removeprefix("Bearer ") if authorization else ""
+            if not secrets.compare_digest(supplied, write_token):
+                raise HTTPException(status_code=401, detail="invalid API token")
         return {"id": store.put(report)}
 
     @app.get("/api/reports")

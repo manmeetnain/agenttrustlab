@@ -12,6 +12,7 @@ def test_server_health_catalog_and_dashboard(tmp_path) -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "Release trust gate" in response.text
+    assert response.headers["x-content-type-options"] == "nosniff"
 
 
 def test_report_api(tmp_path) -> None:
@@ -33,3 +34,25 @@ def test_report_api(tmp_path) -> None:
     assert len(client.get("/api/reports").json()) == 1
     assert client.get("/api/reports/missing").status_code == 404
     assert client.get("/api/reports?limit=0").status_code == 422
+
+
+def test_report_api_token(tmp_path) -> None:
+    import asyncio
+
+    from agenttrustlab import EvaluationCase, EvaluationEngine, PlainPythonAdapter
+
+    client = TestClient(create_app(tmp_path / "protected.db", api_token="secret"))
+    report = asyncio.run(
+        EvaluationEngine().evaluate(
+            PlainPythonAdapter(lambda case, tools: "ok"),
+            [EvaluationCase(id="protected", prompt="x")],
+        )
+    )
+    payload = report.model_dump(mode="json")
+    assert client.post("/api/reports", json=payload).status_code == 401
+    assert (
+        client.post(
+            "/api/reports", json=payload, headers={"Authorization": "Bearer secret"}
+        ).status_code
+        == 201
+    )

@@ -11,6 +11,8 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - State snapshots and rollback invariant verification
 - Canonical SHA-256 evidence manifests with optional HMAC signatures
 - Local-first FastAPI trust cockpit and `agenttrust serve`
+- Ed25519 evidence signing, verification and protected API ingestion
+- Non-root read-only container deployment and container health CI
 
 ## [0.1.0] - 2026-08-28
 

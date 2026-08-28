@@ -1,0 +1,32 @@
+name: Container
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: agenttrustlab:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: docker run --detach --name agenttrustlab -p 8787:8787 agenttrustlab:test
+      - run: |
+          for attempt in 1 2 3 4 5; do
+            if docker exec agenttrustlab python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8787/health', timeout=2)"; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs agenttrustlab
+          exit 1
+

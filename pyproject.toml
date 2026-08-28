@@ -32,8 +32,9 @@ dependencies = [
 openai = ["openai-agents>=0.2"]
 otel = ["opentelemetry-api>=1.25", "opentelemetry-sdk>=1.25"]
 server = ["fastapi>=0.115", "uvicorn>=0.30"]
+signing = ["cryptography>=43"]
 dev = [
-  "agenttrustlab[openai,otel,server]",
+  "agenttrustlab[openai,otel,server,signing]",
   "build>=1.2",
   "hypothesis>=6.100",
   "mypy>=1.10",

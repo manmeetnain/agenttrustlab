@@ -2,7 +2,7 @@ import asyncio
 
 from agenttrustlab import EvaluationCase, EvaluationEngine, PlainPythonAdapter
 from agenttrustlab.attacks import AttackKind, attack_cases
-from agenttrustlab.evidence import create_manifest, verify_manifest
+from agenttrustlab.evidence import create_manifest, generate_ed25519_keypair, verify_manifest
 from agenttrustlab.state import StateSnapshot, verify_rollback
 
 
@@ -52,3 +52,20 @@ def test_signed_manifest_detects_wrong_key_and_report_change() -> None:
     )
     assert verify_manifest(manifest, report, b"secret")
     assert not verify_manifest(manifest, report, b"wrong")
+
+
+def test_ed25519_manifest_is_publicly_verifiable() -> None:
+    report = asyncio.run(
+        EvaluationEngine().evaluate(
+            PlainPythonAdapter(lambda case, tools: "ok"),
+            [EvaluationCase(id="signed", prompt="x")],
+        )
+    )
+    private_key, _ = generate_ed25519_keypair()
+    manifest = create_manifest(
+        report,
+        policy_profile="community-balanced@1.0.0",
+        private_key_pem=private_key,
+    )
+    assert manifest.signature_algorithm == "ed25519"
+    assert verify_manifest(manifest, report)

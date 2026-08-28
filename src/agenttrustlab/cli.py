@@ -16,7 +16,12 @@ from agenttrustlab.attacks import attack_cases
 from agenttrustlab.baselines import compare_reports, measurements_from_report
 from agenttrustlab.contracts import EvaluationCase, RunConfig
 from agenttrustlab.engine import EvaluationEngine
-from agenttrustlab.evidence import create_manifest
+from agenttrustlab.evidence import (
+    EvidenceManifest,
+    create_manifest,
+    generate_ed25519_keypair,
+    verify_manifest,
+)
 from agenttrustlab.profiles import COMMUNITY_BALANCED, COMMUNITY_HIGH_IMPACT
 from agenttrustlab.reporting import write_html, write_json
 from agenttrustlab.storage import ReportStore
@@ -47,6 +52,7 @@ def run(
     manifest: Path = typer.Option(Path("agenttrust-manifest.json")),
     baseline: Path | None = typer.Option(None, exists=True, dir_okay=False),
     store: Path | None = typer.Option(None, help="Persist the report to a dashboard SQLite DB."),
+    signing_key: Path | None = typer.Option(None, exists=True, dir_okay=False),
 ) -> None:
     """Run a Python evaluation suite."""
     agent, cases = _load_suite(suite)
@@ -69,6 +75,7 @@ def run(
         report,
         policy_profile=f"{selected_profile.name}@{selected_profile.version}",
         limitations=("Local environment and declared cases only",),
+        private_key_pem=signing_key.read_bytes() if signing_key else None,
     )
     manifest.write_text(evidence.model_dump_json(indent=2), encoding="utf-8")
     verdict = evaluate_release(measurements_from_report(report), selected_profile)
@@ -93,6 +100,36 @@ def run(
     console.print(f"Release verdict: [bold]{verdict.status.value.upper()}[/]")
     console.print(f"Evidence manifest: {manifest}")
     raise typer.Exit(code=0 if verdict.status == GateStatus.PASSED else 1)
+
+
+@app.command()
+def keygen(
+    private_key: Path = typer.Option(Path("agenttrust-private.pem")),
+    public_key: Path = typer.Option(Path("agenttrust-public.pem")),
+) -> None:
+    """Generate an Ed25519 evidence-signing keypair."""
+    if private_key.exists() or public_key.exists():
+        raise typer.BadParameter("refusing to overwrite an existing key")
+    private_bytes, public_bytes = generate_ed25519_keypair()
+    private_key.write_bytes(private_bytes)
+    private_key.chmod(0o600)
+    public_key.write_bytes(public_bytes)
+    console.print(f"Created {private_key} and {public_key}")
+
+
+@app.command("verify")
+def verify_evidence(
+    report: Path = typer.Argument(..., exists=True, dir_okay=False),
+    manifest: Path = typer.Argument(..., exists=True, dir_okay=False),
+) -> None:
+    """Verify an evidence manifest and its report digest/signature."""
+    from agenttrustlab.contracts import EvaluationReport
+
+    parsed_report = EvaluationReport.model_validate_json(report.read_text(encoding="utf-8"))
+    parsed_manifest = EvidenceManifest.model_validate_json(manifest.read_text(encoding="utf-8"))
+    valid = verify_manifest(parsed_manifest, parsed_report)
+    console.print("Evidence verified" if valid else "Evidence verification failed")
+    raise typer.Exit(code=0 if valid else 1)
 
 
 @app.command()

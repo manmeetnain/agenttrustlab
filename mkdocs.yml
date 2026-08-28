@@ -18,4 +18,5 @@ nav:
   - Trust model: trust-model.md
   - Security testing: security-testing.md
   - Adapters: adapters.md
+  - Self-hosting: deployment.md
   - Roadmap: roadmap.md

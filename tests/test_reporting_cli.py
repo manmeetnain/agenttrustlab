@@ -46,3 +46,14 @@ def test_cli_end_to_end(tmp_path) -> None:
     assert (tmp_path / "x.html").exists()
     assert (tmp_path / "manifest.json").exists()
     assert (tmp_path / "reports.db").exists()
+
+
+def test_cli_keygen_refuses_overwrite(tmp_path) -> None:
+    private = tmp_path / "private.pem"
+    public = tmp_path / "public.pem"
+    args = ["keygen", "--private-key", str(private), "--public-key", str(public)]
+    first = CliRunner().invoke(app, args)
+    assert first.exit_code == 0, first.output
+    assert private.exists() and public.exists()
+    second = CliRunner().invoke(app, args)
+    assert second.exit_code != 0

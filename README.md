@@ -34,6 +34,15 @@ cases = [
 
 The command produces a concise terminal result plus `agenttrust-report.json` and a professional, portable HTML report.
 
+Launch the optional local evidence explorer:
+
+```bash
+python -m pip install 'agenttrustlab[server]'
+agenttrust serve
+```
+
+The web product remains local-first: reports, policies and evidence do not require a hosted AgentTrustLab account.
+
 ## v0.1 scope
 
 - Strict, versionable Pydantic contracts
@@ -44,6 +53,8 @@ The command produces a concise terminal result plus `agenttrust-report.json` and
 - Correctness, tool, evidence, cost, and latency scoring
 - Typer/Rich CLI and pytest fixture
 - JSON and dependency-free HTML reports
+- Standards-mapped attack cases, rollback verification and tamper-evident manifests
+- Optional FastAPI evidence explorer at `agenttrust serve`
 - Python 3.11–3.13 CI, property tests, typing, lint, coverage, package validation
 - Trusted Publishing-compatible release workflow and GitHub Pages documentation
 
@@ -54,4 +65,3 @@ See the [architecture](docs/architecture.md), [threat model](docs/threat-model.m
 No evaluation can prove that an agent is safe in every environment. AgentTrustLab provides reproducible evidence under declared cases and policies. Report security issues privately through GitHub Security Advisories; do not open public issues for vulnerabilities.
 
 Licensed under Apache-2.0.
-

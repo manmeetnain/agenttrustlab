@@ -66,3 +66,16 @@ def version() -> None:
     from agenttrustlab import __version__
 
     console.print(__version__)
+
+
+@app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", help="Bind address."),
+    port: int = typer.Option(8787, min=1, max=65535),
+) -> None:
+    """Launch the local evidence explorer."""
+    try:
+        import uvicorn
+    except ImportError as exc:
+        raise typer.BadParameter("Install AgentTrustLab with the 'server' extra") from exc
+    uvicorn.run("agenttrustlab.server:app", host=host, port=port)

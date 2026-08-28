@@ -4,6 +4,14 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 
 ## [Unreleased]
 
+### Added
+
+- Standards registry and explicit community release profiles
+- Deterministic prompt-injection, exfiltration and memory-poisoning attack cases
+- State snapshots and rollback invariant verification
+- Canonical SHA-256 evidence manifests with optional HMAC signatures
+- Local-first FastAPI trust cockpit and `agenttrust serve`
+
 ## [0.1.0] - 2026-08-28
 
 ### Added
@@ -15,4 +23,3 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 
 [Unreleased]: https://github.com/manmeetnain/agenttrustlab/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/manmeetnain/agenttrustlab/releases/tag/v0.1.0
-

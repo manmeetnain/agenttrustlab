@@ -105,6 +105,7 @@ class RunRecord(StrictModel):
     violations: tuple[str, ...] = ()
     error: str | None = None
     latency_ms: float = Field(default=0, ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class EvaluationReport(StrictModel):

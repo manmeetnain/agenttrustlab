@@ -29,7 +29,17 @@ def test_cli_end_to_end(tmp_path) -> None:
     )
     result = CliRunner().invoke(
         app,
-        ["run", str(suite), "--json", str(tmp_path / "x.json"), "--html", str(tmp_path / "x.html")],
+        [
+            "run",
+            str(suite),
+            "--json",
+            str(tmp_path / "x.json"),
+            "--html",
+            str(tmp_path / "x.html"),
+            "--manifest",
+            str(tmp_path / "manifest.json"),
+        ],
     )
     assert result.exit_code == 0, result.output
     assert (tmp_path / "x.html").exists()
+    assert (tmp_path / "manifest.json").exists()

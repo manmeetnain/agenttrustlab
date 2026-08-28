@@ -75,11 +75,16 @@ class EvaluationEngine:
                 score=score,
                 violations=decision.violations,
                 latency_ms=latency,
+                metadata=case.metadata,
             )
         except TimeoutError:
             latency = (perf_counter() - started) * 1000
             return RunRecord(
-                case_id=case.id, status=RunStatus.ERROR, error="agent timed out", latency_ms=latency
+                case_id=case.id,
+                status=RunStatus.ERROR,
+                error="agent timed out",
+                latency_ms=latency,
+                metadata=case.metadata,
             )
         except Exception as exc:
             latency = (perf_counter() - started) * 1000
@@ -88,4 +93,5 @@ class EvaluationEngine:
                 status=RunStatus.ERROR,
                 error=f"{type(exc).__name__}: {exc}",
                 latency_ms=latency,
+                metadata=case.metadata,
             )

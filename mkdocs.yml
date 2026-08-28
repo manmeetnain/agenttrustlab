@@ -12,7 +12,10 @@ theme:
   features: [navigation.instant, navigation.sections, content.code.copy]
 nav:
   - Home: index.md
+  - Getting started: getting-started.md
   - Architecture: architecture.md
   - Threat model: threat-model.md
   - Trust model: trust-model.md
+  - Security testing: security-testing.md
+  - Adapters: adapters.md
   - Roadmap: roadmap.md

@@ -13,6 +13,7 @@ from agenttrustlab.contracts import (
     ToolResult,
 )
 from agenttrustlab.engine import EvaluationEngine
+from agenttrustlab.framework_adapters import LangGraphAdapter, MCPAdapter, PydanticAIAdapter
 from agenttrustlab.policies import DefaultSafetyPolicy, PolicyDecision
 from agenttrustlab.tools import SimulatedTool, ToolRegistry
 
@@ -24,8 +25,11 @@ __all__ = [
     "EvaluationEngine",
     "EvaluationReport",
     "ExpectedOutcome",
+    "LangGraphAdapter",
+    "MCPAdapter",
     "PlainPythonAdapter",
     "PolicyDecision",
+    "PydanticAIAdapter",
     "RunConfig",
     "RunStatus",
     "ScoreCard",

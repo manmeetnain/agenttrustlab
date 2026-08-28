@@ -30,7 +30,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with: {name: documentation-site, path: site}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

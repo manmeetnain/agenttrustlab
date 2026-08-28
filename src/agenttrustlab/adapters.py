@@ -15,7 +15,8 @@ from agenttrustlab.tools import ToolRegistry
 class AgentAdapter(Protocol):
     name: str
 
-    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult: ...
+    async def run(self, case: EvaluationCase, tools: ToolRegistry) -> AgentResult:
+        raise NotImplementedError
 
 
 AgentFunction = Callable[

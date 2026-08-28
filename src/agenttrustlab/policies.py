@@ -17,7 +17,8 @@ class PolicyDecision(BaseModel):
 
 
 class SafetyPolicy(Protocol):
-    def evaluate(self, case: EvaluationCase, result: AgentResult) -> PolicyDecision: ...
+    def evaluate(self, case: EvaluationCase, result: AgentResult) -> PolicyDecision:
+        raise NotImplementedError
 
 
 class DefaultSafetyPolicy:

@@ -8,7 +8,7 @@ from importlib.resources import files
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 
 from agenttrustlab import __version__
 from agenttrustlab.attacks import BUILTIN_ATTACKS
@@ -46,8 +46,9 @@ def create_app(database: str | Path | None = None, api_token: str | None = None)
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; style-src 'self' 'unsafe-inline'; "
-            "script-src 'self' 'unsafe-inline'; connect-src 'self'"
+            "default-src 'self'; style-src 'self'; script-src 'self'; "
+            "connect-src 'self'; img-src 'self' data:; object-src 'none'; "
+            "base-uri 'none'; frame-ancestors 'none'"
         )
         return response
 
@@ -95,6 +96,22 @@ def create_app(database: str | Path | None = None, api_token: str | None = None)
     @app.get("/", response_class=HTMLResponse)
     def dashboard() -> str:
         return files("agenttrustlab.web").joinpath("index.html").read_text(encoding="utf-8")
+
+    @app.get("/assets/app.css", include_in_schema=False)
+    def dashboard_css() -> Response:
+        content = files("agenttrustlab.web").joinpath("app.css").read_text(encoding="utf-8")
+        return Response(
+            content=content, media_type="text/css", headers={"Cache-Control": "no-cache"}
+        )
+
+    @app.get("/assets/app.js", include_in_schema=False)
+    def dashboard_javascript() -> Response:
+        content = files("agenttrustlab.web").joinpath("app.js").read_text(encoding="utf-8")
+        return Response(
+            content=content,
+            media_type="text/javascript",
+            headers={"Cache-Control": "no-cache"},
+        )
 
     return app
 

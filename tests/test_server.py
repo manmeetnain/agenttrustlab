@@ -11,8 +11,12 @@ def test_server_health_catalog_and_dashboard(tmp_path) -> None:
     assert catalog["profiles"][0]["name"] == "community-balanced"
     response = client.get("/")
     assert response.status_code == 200
-    assert "Release trust gate" in response.text
+    assert "Verification overview" in response.text
+    assert "43 / 47" not in response.text
+    assert "unsafe-inline" not in response.headers["content-security-policy"]
     assert response.headers["x-content-type-options"] == "nosniff"
+    assert client.get("/assets/app.css").headers["content-type"].startswith("text/css")
+    assert client.get("/assets/app.js").headers["content-type"].startswith("text/javascript")
 
 
 def test_report_api(tmp_path) -> None:

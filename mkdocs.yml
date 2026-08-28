@@ -14,5 +14,5 @@ nav:
   - Home: index.md
   - Architecture: architecture.md
   - Threat model: threat-model.md
+  - Trust model: trust-model.md
   - Roadmap: roadmap.md
-

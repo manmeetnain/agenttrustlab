@@ -28,7 +28,7 @@ dependencies = [
   "PyYAML>=6.0.2,<7",
   "regex>=2024.11.6,<2027",
   "typer>=0.12,<1",
-  "rich>=13.7,<15",
+  "rich>=13.7,<16",
 ]
 
 [project.optional-dependencies]

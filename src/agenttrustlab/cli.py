@@ -24,7 +24,7 @@ from agenttrustlab.evidence import (
     verify_manifest,
 )
 from agenttrustlab.profiles import COMMUNITY_BALANCED, COMMUNITY_HIGH_IMPACT
-from agenttrustlab.reporting import write_html, write_json
+from agenttrustlab.reporting import write_html, write_json, write_junit, write_markdown, write_sarif
 from agenttrustlab.scenarios import (
     EXAMPLE_SCENARIO_YAML,
     discover_scenarios,
@@ -126,6 +126,9 @@ def run(
     ),
     json_report: Path = typer.Option(Path("agenttrust-report.json"), "--json"),
     html_report: Path = typer.Option(Path("agenttrust-report.html"), "--html"),
+    junit_report: Path = typer.Option(Path("agenttrust-report.xml"), "--junit"),
+    sarif_report: Path = typer.Option(Path("agenttrust-report.sarif"), "--sarif"),
+    markdown_report: Path = typer.Option(Path("agenttrust-report.md"), "--markdown"),
     seed: int = typer.Option(0),
     repetitions: int = typer.Option(1, min=1, max=100),
     attacks: bool = typer.Option(False, "--attacks", help="Add built-in adversarial cases."),
@@ -164,6 +167,9 @@ def run(
     )
     write_json(report, json_report)
     write_html(report, html_report)
+    write_junit(report, junit_report)
+    write_sarif(report, sarif_report)
+    write_markdown(report, markdown_report)
     if store:
         ReportStore(store).put(report)
     evidence = create_manifest(

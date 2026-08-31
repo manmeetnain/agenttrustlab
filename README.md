@@ -32,7 +32,7 @@ cases = [
 ]
 ```
 
-The command produces a concise terminal result plus `agenttrust-report.json` and a professional, portable HTML report.
+The command produces a concise terminal result plus JSON, portable HTML, JUnit XML, SARIF 2.1.0 and Markdown audit reports.
 
 Create reviewable YAML scenarios without writing framework code:
 

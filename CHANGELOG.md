@@ -17,6 +17,7 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Framework-neutral confirmation, step, retry, and repeated-call loop safeguards
 - Structured behavioral assessments with trace-derived measurement provenance
 - Validated 20-case security, reliability, evidence, and efficiency scenario pack
+- JUnit XML, SARIF 2.1.0, and Markdown audit reports for CI and review workflows
 
 ### Changed
 

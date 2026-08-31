@@ -5,7 +5,13 @@ from typer.testing import CliRunner
 
 from agenttrustlab import EvaluationCase, EvaluationEngine, PlainPythonAdapter
 from agenttrustlab.cli import app
-from agenttrustlab.reporting import write_html, write_json
+from agenttrustlab.reporting import (
+    write_html,
+    write_json,
+    write_junit,
+    write_markdown,
+    write_sarif,
+)
 
 
 def test_reports(tmp_path) -> None:
@@ -16,8 +22,14 @@ def test_reports(tmp_path) -> None:
     )
     json_path = write_json(report, tmp_path / "report.json")
     html_path = write_html(report, tmp_path / "report.html")
+    junit_path = write_junit(report, tmp_path / "report.xml")
+    sarif_path = write_sarif(report, tmp_path / "report.sarif")
+    markdown_path = write_markdown(report, tmp_path / "report.md")
     assert json.loads(json_path.read_text())["adapter"] == "plain-python"
     assert "AgentTrustLab" in html_path.read_text()
+    assert "testsuite" in junit_path.read_text()
+    assert json.loads(sarif_path.read_text())["version"] == "2.1.0"
+    assert "**PASS**" in markdown_path.read_text()
 
 
 def test_cli_end_to_end(tmp_path) -> None:
@@ -38,6 +50,12 @@ def test_cli_end_to_end(tmp_path) -> None:
             str(tmp_path / "x.html"),
             "--manifest",
             str(tmp_path / "manifest.json"),
+            "--junit",
+            str(tmp_path / "x.xml"),
+            "--sarif",
+            str(tmp_path / "x.sarif"),
+            "--markdown",
+            str(tmp_path / "x.md"),
             "--store",
             str(tmp_path / "reports.db"),
         ],
@@ -46,6 +64,9 @@ def test_cli_end_to_end(tmp_path) -> None:
     assert (tmp_path / "x.html").exists()
     assert (tmp_path / "manifest.json").exists()
     assert (tmp_path / "reports.db").exists()
+    assert (tmp_path / "x.xml").exists()
+    assert (tmp_path / "x.sarif").exists()
+    assert (tmp_path / "x.md").exists()
 
 
 def test_cli_keygen_refuses_overwrite(tmp_path) -> None:

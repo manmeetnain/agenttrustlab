@@ -8,10 +8,23 @@ It converts agent behavior into stable evidence: typed inputs and outputs, polic
 
 ```bash
 pip install agenttrustlab
-agenttrust run examples/basic_suite.py --repetitions 3
+agenttrust init my-agent-trust
+cd my-agent-trust
+agenttrust run scenarios --target agenttrust-target.yml
 ```
 
-Start with deterministic simulated tools. Introduce live model and tool integrations only in explicitly labeled integration suites with bounded budgets and credentials isolated from untrusted content.
+The generated starter is immediately runnable and produces JSON, HTML, JUnit, SARIF, Markdown and tamper-evident manifest outputs. Its YAML contract defines output expectations, tool traces, adversarial variants, confirmation rules, loop detection and execution budgets.
+
+## What ships
+
+- A deterministic verification engine and framework-neutral normalized evidence model
+- Active security cases and a validated 20-case core scenario pack
+- Explainable tool-trace and behavioral differences, never opaque pass/fail labels
+- Plain-Python execution plus adapter boundaries for OpenAI Agents, MCP and other ecosystems
+- Pytest fixtures, release gates and CI-native report formats
+- A local-first evidence cockpit—no hosted account required
+
+Start with simulated tools. Introduce live model and tool integrations only in explicitly labeled integration suites with bounded budgets and credentials isolated from untrusted content.
 
 ## Principles
 
@@ -20,4 +33,3 @@ Start with deterministic simulated tools. Introduce live model and tool integrat
 3. Tests are deterministic by default and uncertainty is measured.
 4. Untrusted agent output never becomes authority.
 5. Adapters normalize observations; policies decide trust.
-

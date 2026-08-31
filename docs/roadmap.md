@@ -67,6 +67,8 @@ Current status:
 - Argument hallucination checks
 - Cost, latency, state and rollback invariants
 
+Status: confirmation ordering, step/retry budgets, repeated-call loop detection and strict argument integrity are implemented. Richer state invariants remain ongoing.
+
 ### M4 — Launch-depth execution targets
 
 Deep, real-dependency verification for:
@@ -81,6 +83,8 @@ Broader adapters remain experimental until they pass the same evidence gates.
 
 At least 20 complete cases spanning tool selection, argument integrity, confirmation, injection, exfiltration, memory, privilege, supply chain, inter-agent messages, retries, cost, latency and rollback.
 
+Status: the versioned 20-case core pack is shipped and validated in CI.
+
 ### M6 — Audit-grade reporting
 
 - Markdown executive and engineering report
@@ -88,6 +92,8 @@ At least 20 complete cases spanning tool selection, argument integrity, confirma
 - Severity and remediation guidance
 - JUnit and SARIF interoperability
 - Signed evidence and cockpit integration
+
+Status: JSON, HTML, JUnit XML, SARIF 2.1.0, Markdown, signed evidence and the local cockpit are implemented. Severity-specific remediation guidance remains ongoing.
 
 ### M7 — Public benchmark and launch
 

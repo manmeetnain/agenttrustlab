@@ -9,6 +9,9 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Versioned YAML scenario contracts with explicit tool-argument matchers
 - Safe bounded YAML loading and adversarial-variant inheritance
 - JSON Schema generation plus `agenttrust init`, `validate` and `schema` commands
+- Ordered and unordered tool-trace assertions with structured failure differences
+- Exact, containment, regex, type and presence argument matching
+- Trace assertions as hard engine gates with a dedicated weighted score
 
 ### Changed
 

@@ -32,6 +32,12 @@ from agenttrustlab.scenarios import (
     to_evaluation_case,
 )
 from agenttrustlab.tools import SimulatedTool, ToolRegistry
+from agenttrustlab.trace_assertions import (
+    DifferenceKind,
+    TraceAssertionResult,
+    TraceDifference,
+    assert_trace,
+)
 
 __all__ = [
     "AgentAdapter",
@@ -39,6 +45,7 @@ __all__ = [
     "AutoGenAdapter",
     "CrewAIAdapter",
     "DefaultSafetyPolicy",
+    "DifferenceKind",
     "EvaluationCase",
     "EvaluationEngine",
     "EvaluationReport",
@@ -60,6 +67,9 @@ __all__ = [
     "ToolCall",
     "ToolRegistry",
     "ToolResult",
+    "TraceAssertionResult",
+    "TraceDifference",
+    "assert_trace",
     "expand_scenario",
     "load_scenario",
     "to_evaluation_case",

@@ -41,7 +41,7 @@ agenttrust init
 agenttrust validate scenarios/
 ```
 
-YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. See the [scenario guide](docs/scenarios.md).
+YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. Trace divergence produces structured missing, unexpected, reordered, duplicate and argument-level differences. See the [scenario guide](docs/scenarios.md).
 
 Launch the optional local evidence explorer:
 

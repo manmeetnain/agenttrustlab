@@ -16,8 +16,10 @@ from agenttrustlab.contracts import (
     RunStatus,
 )
 from agenttrustlab.policies import DefaultSafetyPolicy, SafetyPolicy
+from agenttrustlab.scenarios import TraceExpectation
 from agenttrustlab.scoring import score_result
 from agenttrustlab.tools import ToolRegistry
+from agenttrustlab.trace_assertions import assert_trace
 
 
 class EvaluationEngine:
@@ -66,16 +68,37 @@ class EvaluationEngine:
             )
             latency = (perf_counter() - started) * 1000
             decision = self.policy.evaluate(case, result)
-            score = score_result(case, result, latency)
-            status = RunStatus.PASSED if decision.allowed and score.passed else RunStatus.FAILED
+            trace_data = case.metadata.get("trace_expectation")
+            trace_assertion = (
+                assert_trace(TraceExpectation.model_validate(trace_data), result.tool_calls)
+                if trace_data is not None
+                else None
+            )
+            trace_violations = (
+                tuple(difference.message for difference in trace_assertion.differences)
+                if trace_assertion is not None
+                else ()
+            )
+            score = score_result(
+                case,
+                result,
+                latency,
+                trace_passed=trace_assertion.passed if trace_assertion is not None else None,
+            )
+            violations = (*decision.violations, *trace_violations)
+            allowed = decision.allowed and not trace_violations
+            status = RunStatus.PASSED if allowed and score.passed else RunStatus.FAILED
+            metadata = dict(case.metadata)
+            if trace_assertion is not None:
+                metadata["trace_assertion"] = trace_assertion.model_dump(mode="json")
             return RunRecord(
                 case_id=case.id,
                 status=status,
                 result=result,
                 score=score,
-                violations=decision.violations,
+                violations=violations,
                 latency_ms=latency,
-                metadata=case.metadata,
+                metadata=metadata,
             )
         except TimeoutError:
             latency = (perf_counter() - started) * 1000

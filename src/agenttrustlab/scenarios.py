@@ -69,7 +69,7 @@ class TypeMatcher(ScenarioModel):
 
 class PresentMatcher(ScenarioModel):
     match: Literal["present"]
-    value: bool = True
+    value: Literal[True] = True
 
 
 ArgumentMatcher = Annotated[
@@ -81,6 +81,7 @@ ArgumentMatcher = Annotated[
 class ToolCallExpectation(ScenarioModel):
     tool: str = Field(min_length=1)
     arguments: dict[str, ArgumentMatcher] = Field(default_factory=dict)
+    allow_unexpected_arguments: bool = True
     optional: bool = False
     maximum_occurrences: int = Field(default=1, ge=1, le=100)
 

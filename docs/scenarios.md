@@ -60,7 +60,20 @@ arguments:
   confirmation_id: {match: present, value: true}
 ```
 
-The schema supports `equals`, `contains`, `regex`, `type` and `present`. Matcher execution and trace-diff explanations are delivered in the trace assertion milestone; version 1 parsing already preserves the complete expectation in run metadata.
+The engine executes `equals`, `contains`, `regex`, `type` and `present` matchers. Regex evaluation is length-bounded and time-bounded. Trace failures are stored as structured differences and rendered as explicit violations rather than a generic tool-use failure.
+
+## Trace differences
+
+Ordered and unordered traces detect:
+
+- missing calls
+- unexpected calls
+- reordered calls
+- duplicate calls beyond a declared maximum
+- missing or mismatched arguments
+- unexpected arguments when strict argument mode is selected
+
+Every difference includes the tool, expected and observed positions, argument path, expected matcher, observed value and a deterministic explanation. A trace difference is a hard evaluation failure and contributes a dedicated weighted trace score.
 
 ## Safety limits
 

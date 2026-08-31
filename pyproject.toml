@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
   "pydantic>=2.7,<3",
   "PyYAML>=6.0.2,<7",
+  "regex>=2024.11.6,<2027",
   "typer>=0.12,<1",
   "rich>=13.7,<15",
 ]
@@ -44,6 +45,7 @@ dev = [
   "pytest-cov>=5",
   "ruff>=0.6",
   "types-PyYAML>=6.0.12",
+  "types-regex>=2024.11.6",
 ]
 docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.25"]
 

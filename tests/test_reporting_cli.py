@@ -57,3 +57,34 @@ def test_cli_keygen_refuses_overwrite(tmp_path) -> None:
     assert private.exists() and public.exists()
     second = CliRunner().invoke(app, args)
     assert second.exit_code != 0
+
+
+def test_cli_init_validate_and_schema(tmp_path) -> None:
+    runner = CliRunner()
+    initialized = runner.invoke(app, ["init", str(tmp_path)])
+    assert initialized.exit_code == 0, initialized.output
+    scenario = tmp_path / "scenarios" / "refund-confirmation.yml"
+    schema = tmp_path / "agenttrust.schema.json"
+    assert scenario.exists() and schema.exists()
+    assert json.loads(schema.read_text())["properties"]["version"]["const"] == "1"
+
+    validated = runner.invoke(app, ["validate", str(tmp_path / "scenarios")])
+    assert validated.exit_code == 0, validated.output
+    assert "payments.refund-confirmati" in validated.output
+    assert "valid" in validated.output
+
+    collision = runner.invoke(app, ["init", str(tmp_path)])
+    assert collision.exit_code != 0
+
+    explicit_schema = tmp_path / "standalone.schema.json"
+    generated = runner.invoke(app, ["schema", "--output", str(explicit_schema)])
+    assert generated.exit_code == 0, generated.output
+    assert explicit_schema.exists()
+
+
+def test_cli_validate_reports_invalid_file(tmp_path) -> None:
+    invalid = tmp_path / "invalid.yml"
+    invalid.write_text('version: "2"\nscenario: {}\n', encoding="utf-8")
+    result = CliRunner().invoke(app, ["validate", str(invalid)])
+    assert result.exit_code == 1
+    assert "ValidationError" in result.output

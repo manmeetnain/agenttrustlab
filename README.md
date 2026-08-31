@@ -34,6 +34,15 @@ cases = [
 
 The command produces a concise terminal result plus `agenttrust-report.json` and a professional, portable HTML report.
 
+Create reviewable YAML scenarios without writing framework code:
+
+```bash
+agenttrust init
+agenttrust validate scenarios/
+```
+
+YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. See the [scenario guide](docs/scenarios.md).
+
 Launch the optional local evidence explorer:
 
 ```bash

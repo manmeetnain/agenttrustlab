@@ -13,6 +13,7 @@ theme:
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - YAML scenarios: scenarios.md
   - Architecture: architecture.md
   - Threat model: threat-model.md
   - Trust model: trust-model.md

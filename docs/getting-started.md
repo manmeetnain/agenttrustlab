@@ -8,6 +8,15 @@ AgentTrustLab is local-first. A hosted account is not required.
 python -m pip install 'agenttrustlab[server]'
 ```
 
+Initialize and validate a YAML scenario workspace:
+
+```bash
+agenttrust init
+agenttrust validate scenarios/
+```
+
+YAML execution through a selected target is the next vertical slice. The current `run` command executes Python suites; validation already guarantees the versioned scenario shape and produces editor-compatible JSON Schema.
+
 Create `agenttrust_suite.py`:
 
 ```python
@@ -55,4 +64,3 @@ def test_release(agenttrust_evaluate, agenttrust_assert):
 ```
 
 Select the stricter profile with `pytest --agenttrust-profile high-impact`.
-

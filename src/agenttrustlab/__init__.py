@@ -23,6 +23,14 @@ from agenttrustlab.framework_adapters import (
     SmolagentsAdapter,
 )
 from agenttrustlab.policies import DefaultSafetyPolicy, PolicyDecision
+from agenttrustlab.scenarios import (
+    ExpandedScenario,
+    ScenarioDefinition,
+    ScenarioFile,
+    expand_scenario,
+    load_scenario,
+    to_evaluation_case,
+)
 from agenttrustlab.tools import SimulatedTool, ToolRegistry
 
 __all__ = [
@@ -34,6 +42,7 @@ __all__ = [
     "EvaluationCase",
     "EvaluationEngine",
     "EvaluationReport",
+    "ExpandedScenario",
     "ExpectedOutcome",
     "GoogleADKAdapter",
     "LangGraphAdapter",
@@ -43,11 +52,16 @@ __all__ = [
     "PydanticAIAdapter",
     "RunConfig",
     "RunStatus",
+    "ScenarioDefinition",
+    "ScenarioFile",
     "ScoreCard",
     "SimulatedTool",
     "SmolagentsAdapter",
     "ToolCall",
     "ToolRegistry",
     "ToolResult",
+    "expand_scenario",
+    "load_scenario",
+    "to_evaluation_case",
 ]
 __version__ = "0.1.0"

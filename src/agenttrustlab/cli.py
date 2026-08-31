@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import json
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,13 @@ from agenttrustlab.evidence import (
 )
 from agenttrustlab.profiles import COMMUNITY_BALANCED, COMMUNITY_HIGH_IMPACT
 from agenttrustlab.reporting import write_html, write_json
+from agenttrustlab.scenarios import (
+    EXAMPLE_SCENARIO_YAML,
+    discover_scenarios,
+    expand_scenario,
+    load_scenario,
+    scenario_json_schema,
+)
 from agenttrustlab.storage import ReportStore
 from agenttrustlab.verdicts import GateStatus, evaluate_release
 
@@ -38,6 +46,60 @@ def _load_suite(path: Path) -> tuple[Any, list[EvaluationCase]]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.agent, list(module.cases)
+
+
+@app.command("init")
+def initialize_project(
+    directory: Path = typer.Argument(Path("."), file_okay=False),
+) -> None:
+    """Create a reviewable starter scenario and editor schema."""
+    scenario_directory = directory / "scenarios"
+    scenario_path = scenario_directory / "refund-confirmation.yml"
+    schema_path = directory / "agenttrust.schema.json"
+    collisions = [path for path in (scenario_path, schema_path) if path.exists()]
+    if collisions:
+        rendered = ", ".join(str(path) for path in collisions)
+        raise typer.BadParameter(f"refusing to overwrite existing files: {rendered}")
+    scenario_directory.mkdir(parents=True, exist_ok=True)
+    scenario_path.write_text(EXAMPLE_SCENARIO_YAML, encoding="utf-8")
+    schema_path.write_text(json.dumps(scenario_json_schema(), indent=2) + "\n", encoding="utf-8")
+    console.print(f"Created {scenario_path}")
+    console.print(f"Created {schema_path}")
+
+
+@app.command("validate")
+def validate_scenarios(
+    paths: list[Path] = typer.Argument(..., help="Scenario files or directories."),
+) -> None:
+    """Validate YAML scenarios without executing an agent."""
+    scenarios = discover_scenarios(paths)
+    if not scenarios:
+        raise typer.BadParameter("no .yml or .yaml scenario files found")
+    table = Table(title="AgentTrustLab scenario validation")
+    table.add_column("File")
+    table.add_column("Scenario")
+    table.add_column("Variants")
+    table.add_column("Status")
+    failures = 0
+    for path in scenarios:
+        try:
+            parsed = load_scenario(path)
+            expanded = expand_scenario(parsed.scenario)
+            table.add_row(str(path), parsed.scenario.id, str(len(expanded) - 1), "[green]valid[/]")
+        except Exception as exc:  # Validation errors are presented per file.
+            failures += 1
+            table.add_row(str(path), "—", "—", f"[red]{type(exc).__name__}: {exc}[/]")
+    console.print(table)
+    raise typer.Exit(code=1 if failures else 0)
+
+
+@app.command("schema")
+def write_scenario_schema(
+    output: Path = typer.Option(Path("agenttrust.schema.json"), "--output", "-o"),
+) -> None:
+    """Write the versioned scenario JSON Schema."""
+    output.write_text(json.dumps(scenario_json_schema(), indent=2) + "\n", encoding="utf-8")
+    console.print(f"Created {output}")
 
 
 @app.command()

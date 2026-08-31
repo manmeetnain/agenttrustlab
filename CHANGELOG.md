@@ -4,7 +4,16 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+
+- Versioned YAML scenario contracts with explicit tool-argument matchers
+- Safe bounded YAML loading and adversarial-variant inheritance
+- JSON Schema generation plus `agenttrust init`, `validate` and `schema` commands
+
+### Changed
+
+- Re-baselined adapter claims with evidence-backed compatibility maturity levels
+- Merged the verification-platform and public-benchmark execution roadmaps
 
 ## [0.1.0] - 2026-08-28
 

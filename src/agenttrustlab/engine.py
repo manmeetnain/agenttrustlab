@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from time import perf_counter
 
 from agenttrustlab.adapters import AgentAdapter
+from agenttrustlab.behavioral import assess_behavior
 from agenttrustlab.contracts import (
     EvaluationCase,
     EvaluationReport,
@@ -16,7 +17,7 @@ from agenttrustlab.contracts import (
     RunStatus,
 )
 from agenttrustlab.policies import DefaultSafetyPolicy, SafetyPolicy
-from agenttrustlab.scenarios import TraceExpectation
+from agenttrustlab.scenarios import BehavioralExpectation, TraceExpectation
 from agenttrustlab.scoring import score_result
 from agenttrustlab.tools import ToolRegistry
 from agenttrustlab.trace_assertions import assert_trace
@@ -79,18 +80,35 @@ class EvaluationEngine:
                 if trace_assertion is not None
                 else ()
             )
+            behavior_data = case.metadata.get("behavior_expectation", {})
+            behavior = BehavioralExpectation.model_validate(behavior_data)
+            confirmation = behavior.confirmation
+            behavioral_assessment = assess_behavior(
+                result,
+                maximum_steps=case.metadata.get("maximum_steps"),
+                maximum_retries=case.metadata.get("maximum_retries"),
+                irreversible_tools=confirmation.irreversible_tools,
+                confirmation_tools=confirmation.confirmation_tools,
+                detect_loops=behavior.detect_loops,
+                loop_threshold=behavior.loop_threshold,
+            )
+            behavioral_violations = tuple(
+                finding.message for finding in behavioral_assessment.findings
+            )
             score = score_result(
                 case,
                 result,
                 latency,
                 trace_passed=trace_assertion.passed if trace_assertion is not None else None,
+                behavior_passed=behavioral_assessment.passed,
             )
-            violations = (*decision.violations, *trace_violations)
-            allowed = decision.allowed and not trace_violations
+            violations = (*decision.violations, *trace_violations, *behavioral_violations)
+            allowed = decision.allowed and not trace_violations and behavioral_assessment.passed
             status = RunStatus.PASSED if allowed and score.passed else RunStatus.FAILED
             metadata = dict(case.metadata)
             if trace_assertion is not None:
                 metadata["trace_assertion"] = trace_assertion.model_dump(mode="json")
+            metadata["behavioral_assessment"] = behavioral_assessment.model_dump(mode="json")
             return RunRecord(
                 case_id=case.id,
                 status=status,

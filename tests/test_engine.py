@@ -111,3 +111,43 @@ def test_scenario_trace_is_a_hard_explainable_gate() -> None:
     assert any("confirm was not observed" in violation for violation in record.violations)
     assert record.metadata["trace_assertion"]["passed"] is False
     assert next(metric for metric in record.score.metrics if metric.name == "trace").value == 0
+
+
+def test_scenario_behavior_is_a_hard_explainable_gate() -> None:
+    scenario = ScenarioDefinition.model_validate(
+        {
+            "id": "behavior-gate",
+            "task": "refund",
+            "expected": {
+                "behavior": {
+                    "confirmation": {
+                        "irreversible_tools": ["execute_refund"],
+                        "confirmation_tools": ["confirm"],
+                    }
+                }
+            },
+            "budgets": {"maximum_steps": 2, "maximum_retries": 0},
+        }
+    )
+    case = to_evaluation_case(expand_scenario(scenario)[0])
+
+    def agent(case, tools):
+        return AgentResult(
+            output="done",
+            tool_calls=(
+                ToolCall(id="1", name="execute_refund"),
+                ToolCall(id="2", name="poll"),
+                ToolCall(id="3", name="poll"),
+            ),
+        )
+
+    record = run(EvaluationEngine().evaluate(PlainPythonAdapter(agent), [case])).runs[0]
+    assert record.status == RunStatus.FAILED
+    assessment = record.metadata["behavioral_assessment"]
+    assert not assessment["passed"]
+    assert {finding["rule"] for finding in assessment["findings"]} == {
+        "confirmation_before_action",
+        "maximum_retries",
+        "maximum_steps",
+    }
+    assert next(metric for metric in record.score.metrics if metric.name == "behavior").value == 0

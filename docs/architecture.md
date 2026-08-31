@@ -23,6 +23,7 @@ AgentResult + normalized trace
           │
           ├── policy decisions
           ├── trace assertions and diffs
+          ├── behavioral safeguards and budgets
           ├── deterministic scoring
           └── release profile gates
           │

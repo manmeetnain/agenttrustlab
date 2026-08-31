@@ -1,6 +1,7 @@
 """AgentTrustLab public API."""
 
 from agenttrustlab.adapters import AgentAdapter, PlainPythonAdapter
+from agenttrustlab.behavioral import BehavioralAssessment, BehavioralFinding, assess_behavior
 from agenttrustlab.contracts import (
     AgentResult,
     EvaluationCase,
@@ -44,6 +45,8 @@ __all__ = [
     "AgentAdapter",
     "AgentResult",
     "AutoGenAdapter",
+    "BehavioralAssessment",
+    "BehavioralFinding",
     "CrewAIAdapter",
     "DefaultSafetyPolicy",
     "DifferenceKind",
@@ -72,6 +75,7 @@ __all__ = [
     "TraceAssertionResult",
     "TraceDifference",
     "assert_trace",
+    "assess_behavior",
     "create_adapter",
     "expand_scenario",
     "load_scenario",

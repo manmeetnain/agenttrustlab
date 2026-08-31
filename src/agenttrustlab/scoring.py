@@ -15,6 +15,7 @@ def score_result(
     latency_ms: float,
     *,
     trace_passed: bool | None = None,
+    behavior_passed: bool | None = None,
 ) -> ScoreCard:
     expected = case.expected
     text = result.output.casefold()
@@ -39,5 +40,7 @@ def score_result(
     ]
     if trace_passed is not None:
         metrics.append(MetricScore(name="trace", value=float(trace_passed), weight=3))
+    if behavior_passed is not None:
+        metrics.append(MetricScore(name="behavior", value=float(behavior_passed), weight=3))
     total = sum(m.value * m.weight for m in metrics) / sum(m.weight for m in metrics)
     return ScoreCard(metrics=tuple(metrics), total=total, passed=all(m.value == 1 for m in metrics))

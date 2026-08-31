@@ -31,6 +31,10 @@ scenario:
             order_id: {match: equals, value: "4821"}
         - tool: request_confirmation
     forbidden_tools: [execute_refund]
+    behavior:
+      confirmation:
+        irreversible_tools: [execute_refund]
+        confirmation_tools: [request_confirmation]
   budgets:
     maximum_steps: 5
     maximum_retries: 1
@@ -97,12 +101,30 @@ class OutputExpectation(ScenarioModel):
     excludes: tuple[str, ...] = ()
 
 
+class ConfirmationExpectation(ScenarioModel):
+    irreversible_tools: tuple[str, ...] = ()
+    confirmation_tools: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def has_confirmation_path(self) -> ConfirmationExpectation:
+        if self.irreversible_tools and not self.confirmation_tools:
+            raise ValueError("irreversible tools require at least one confirmation tool")
+        return self
+
+
+class BehavioralExpectation(ScenarioModel):
+    confirmation: ConfirmationExpectation = Field(default_factory=ConfirmationExpectation)
+    detect_loops: bool = True
+    loop_threshold: int = Field(default=3, ge=2, le=100)
+
+
 class ScenarioExpected(ScenarioModel):
     output: OutputExpectation = Field(default_factory=OutputExpectation)
     trace: TraceExpectation = Field(default_factory=TraceExpectation)
     required_tools: tuple[str, ...] = ()
     forbidden_tools: tuple[str, ...] = ()
     minimum_evidence: int = Field(default=0, ge=0)
+    behavior: BehavioralExpectation = Field(default_factory=BehavioralExpectation)
 
 
 class ExecutionBudgets(ScenarioModel):
@@ -118,6 +140,7 @@ class ExpectedOverride(ScenarioModel):
     required_tools: tuple[str, ...] | None = None
     forbidden_tools: tuple[str, ...] | None = None
     minimum_evidence: int | None = Field(default=None, ge=0)
+    behavior: BehavioralExpectation | None = None
 
 
 class BudgetOverride(ScenarioModel):
@@ -266,6 +289,7 @@ def to_evaluation_case(scenario: ExpandedScenario) -> EvaluationCase:
         "trace_expectation": scenario.expected.trace.model_dump(mode="json"),
         "maximum_steps": scenario.budgets.maximum_steps,
         "maximum_retries": scenario.budgets.maximum_retries,
+        "behavior_expectation": scenario.expected.behavior.model_dump(mode="json"),
     }
     return EvaluationCase(
         id=scenario.id,

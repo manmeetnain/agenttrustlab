@@ -14,6 +14,8 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Trace assertions as hard engine gates with a dedicated weighted score
 - Declarative plain-Python targets and end-to-end YAML scenario execution
 - Runnable target and agent scaffolding from `agenttrust init`
+- Framework-neutral confirmation, step, retry, and repeated-call loop safeguards
+- Structured behavioral assessments with trace-derived measurement provenance
 
 ### Changed
 

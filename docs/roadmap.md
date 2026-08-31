@@ -23,7 +23,7 @@ Current status:
 
 | Integration | Status | Next proof |
 |---|---|---|
-| Plain Python | Verified | YAML execution parity |
+| Plain Python | Verified | Expand real-world target fixtures |
 | OpenAI Agents SDK | Conformant foundation | Pinned real-SDK matrix and cancellation |
 | LangGraph | Experimental | Real graph trace-parity suite |
 | Pydantic AI | Experimental | Real agent usage and trace suite |
@@ -50,6 +50,7 @@ Current status:
 - Adversarial variants with explicit inheritance
 - `agenttrust init`, `agenttrust validate` and `agenttrust schema`
 - YAML-to-engine translation parity
+- Declarative plain-Python target execution
 
 ### M2 — Trace assertion engine
 
@@ -99,7 +100,7 @@ At least 20 complete cases spanning tool selection, argument integrity, confirma
 ## Release strategy
 
 - **v0.1.0 — Foundation:** soft PyPI release of the stable verification kernel.
-- **v0.2.0 — Flagship:** YAML execution, trace diffs, behavioral safeguards, 20-case pack and first public benchmark.
+- **v0.2.0 — Flagship:** behavioral safeguards, 20-case pack, deep MCP/OpenAI verification and first public benchmark.
 
 ## 90-day operating rhythm
 

@@ -12,6 +12,8 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Ordered and unordered tool-trace assertions with structured failure differences
 - Exact, containment, regex, type and presence argument matching
 - Trace assertions as hard engine gates with a dedicated weighted score
+- Declarative plain-Python targets and end-to-end YAML scenario execution
+- Runnable target and agent scaffolding from `agenttrust init`
 
 ### Changed
 

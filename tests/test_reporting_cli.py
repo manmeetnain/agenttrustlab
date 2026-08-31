@@ -65,7 +65,9 @@ def test_cli_init_validate_and_schema(tmp_path) -> None:
     assert initialized.exit_code == 0, initialized.output
     scenario = tmp_path / "scenarios" / "refund-confirmation.yml"
     schema = tmp_path / "agenttrust.schema.json"
-    assert scenario.exists() and schema.exists()
+    target = tmp_path / "agenttrust-target.yml"
+    agent = tmp_path / "agent.py"
+    assert scenario.exists() and schema.exists() and target.exists() and agent.exists()
     assert json.loads(schema.read_text())["properties"]["version"]["const"] == "1"
 
     validated = runner.invoke(app, ["validate", str(tmp_path / "scenarios")])
@@ -80,6 +82,30 @@ def test_cli_init_validate_and_schema(tmp_path) -> None:
     generated = runner.invoke(app, ["schema", "--output", str(explicit_schema)])
     assert generated.exit_code == 0, generated.output
     assert explicit_schema.exists()
+
+    report = tmp_path / "scenario-report.json"
+    html = tmp_path / "scenario-report.html"
+    manifest = tmp_path / "scenario-manifest.json"
+    executed = runner.invoke(
+        app,
+        [
+            "run",
+            str(tmp_path / "scenarios"),
+            "--target",
+            str(target),
+            "--json",
+            str(report),
+            "--html",
+            str(html),
+            "--manifest",
+            str(manifest),
+        ],
+    )
+    assert executed.exit_code == 0, executed.output
+    payload = json.loads(report.read_text())
+    assert len(payload["runs"]) == 2
+    assert all(run["status"] == "passed" for run in payload["runs"])
+    assert all(run["metadata"]["trace_assertion"]["passed"] for run in payload["runs"])
 
 
 def test_cli_validate_reports_invalid_file(tmp_path) -> None:

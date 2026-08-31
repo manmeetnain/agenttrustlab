@@ -8,9 +8,25 @@ YAML scenarios make agent expectations reviewable by developers, QA and security
 agenttrust init
 agenttrust validate scenarios/
 agenttrust schema --output agenttrust.schema.json
+agenttrust run scenarios/ --target agenttrust-target.yml
 ```
 
-`init` refuses to overwrite existing scenario or schema files.
+`init` creates a scenario, schema, plain-Python target declaration and example agent. It refuses to overwrite any existing generated file.
+
+## Execute a target
+
+The generated target declares a Python entrypoint:
+
+```yaml
+version: "1"
+target:
+  adapter: plain-python
+  entrypoint: agent.py:agent
+```
+
+The callable receives the normalized `EvaluationCase` and simulated `ToolRegistry`, just like a Python suite. Scenario directories are discovered in stable path order and every adversarial variant is expanded before execution. The existing JSON, HTML, evidence, policy-profile, baseline and SQLite options work for both YAML and Python-suite runs.
+
+Target files use the same bounded safe-loading rules as scenarios. Loading a target imports and executes the referenced Python module, so run only code you trust; AgentTrustLab is a verifier, not a code sandbox.
 
 ## Contract
 

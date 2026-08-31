@@ -31,6 +31,7 @@ from agenttrustlab.scenarios import (
     load_scenario,
     to_evaluation_case,
 )
+from agenttrustlab.targets import TargetFile, create_adapter, load_target
 from agenttrustlab.tools import SimulatedTool, ToolRegistry
 from agenttrustlab.trace_assertions import (
     DifferenceKind,
@@ -64,14 +65,17 @@ __all__ = [
     "ScoreCard",
     "SimulatedTool",
     "SmolagentsAdapter",
+    "TargetFile",
     "ToolCall",
     "ToolRegistry",
     "ToolResult",
     "TraceAssertionResult",
     "TraceDifference",
     "assert_trace",
+    "create_adapter",
     "expand_scenario",
     "load_scenario",
+    "load_target",
     "to_evaluation_case",
 ]
 __version__ = "0.1.0"

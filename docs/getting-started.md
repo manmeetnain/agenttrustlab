@@ -13,9 +13,21 @@ Initialize and validate a YAML scenario workspace:
 ```bash
 agenttrust init
 agenttrust validate scenarios/
+agenttrust run scenarios/ --target agenttrust-target.yml
 ```
 
-YAML execution through a selected target is the next vertical slice. The current `run` command executes Python suites; validation already guarantees the versioned scenario shape and produces editor-compatible JSON Schema.
+`init` creates a reviewable scenario, editor-compatible JSON Schema, target declaration and small example agent. The run command expands inherited adversarial variants, executes the declared target and applies output, policy and trace gates. It writes JSON, portable HTML and a tamper-evident evidence manifest.
+
+The target file deliberately contains configuration rather than executable YAML:
+
+```yaml
+version: "1"
+target:
+  adapter: plain-python
+  entrypoint: agent.py:agent
+```
+
+Entrypoints are resolved relative to the target file. Only code you trust should be executed.
 
 Create `agenttrust_suite.py`:
 
@@ -34,7 +46,7 @@ cases = [
 ]
 ```
 
-Run the canonical case and all built-in adversarial variants:
+Python suites remain supported. Run one plus all built-in adversarial variants:
 
 ```bash
 agenttrust run agenttrust_suite.py \

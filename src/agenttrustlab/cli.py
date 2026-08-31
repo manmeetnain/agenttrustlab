@@ -12,7 +12,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from agenttrustlab.adapters import PlainPythonAdapter
+from agenttrustlab.adapters import AgentAdapter, PlainPythonAdapter
 from agenttrustlab.attacks import attack_cases
 from agenttrustlab.baselines import compare_reports, measurements_from_report
 from agenttrustlab.contracts import EvaluationCase, RunConfig
@@ -31,8 +31,15 @@ from agenttrustlab.scenarios import (
     expand_scenario,
     load_scenario,
     scenario_json_schema,
+    to_evaluation_case,
 )
 from agenttrustlab.storage import ReportStore
+from agenttrustlab.targets import (
+    EXAMPLE_AGENT_PY,
+    EXAMPLE_TARGET_YAML,
+    create_adapter,
+    load_target,
+)
 from agenttrustlab.verdicts import GateStatus, evaluate_release
 
 app = typer.Typer(help="Independent verification for AI agents.", no_args_is_help=True)
@@ -56,15 +63,24 @@ def initialize_project(
     scenario_directory = directory / "scenarios"
     scenario_path = scenario_directory / "refund-confirmation.yml"
     schema_path = directory / "agenttrust.schema.json"
-    collisions = [path for path in (scenario_path, schema_path) if path.exists()]
+    target_path = directory / "agenttrust-target.yml"
+    agent_path = directory / "agent.py"
+    outputs = (scenario_path, schema_path, target_path, agent_path)
+    collisions = [path for path in outputs if path.exists()]
     if collisions:
         rendered = ", ".join(str(path) for path in collisions)
         raise typer.BadParameter(f"refusing to overwrite existing files: {rendered}")
     scenario_directory.mkdir(parents=True, exist_ok=True)
     scenario_path.write_text(EXAMPLE_SCENARIO_YAML, encoding="utf-8")
     schema_path.write_text(json.dumps(scenario_json_schema(), indent=2) + "\n", encoding="utf-8")
-    console.print(f"Created {scenario_path}")
-    console.print(f"Created {schema_path}")
+    target_path.write_text(EXAMPLE_TARGET_YAML, encoding="utf-8")
+    agent_path.write_text(EXAMPLE_AGENT_PY, encoding="utf-8")
+    for path in outputs:
+        console.print(f"Created {path}")
+    console.print(
+        f"Next: agenttrust run {scenario_directory} --target {target_path}",
+        style="bold blue",
+    )
 
 
 @app.command("validate")
@@ -104,7 +120,10 @@ def write_scenario_schema(
 
 @app.command()
 def run(
-    suite: Path = typer.Argument(..., exists=True, dir_okay=False),
+    suite: Path = typer.Argument(..., exists=True, help="Python suite or YAML scenario path."),
+    target: Path | None = typer.Option(
+        None, "--target", exists=True, dir_okay=False, help="Execution target for YAML scenarios."
+    ),
     json_report: Path = typer.Option(Path("agenttrust-report.json"), "--json"),
     html_report: Path = typer.Option(Path("agenttrust-report.html"), "--html"),
     seed: int = typer.Option(0),
@@ -116,8 +135,24 @@ def run(
     store: Path | None = typer.Option(None, help="Persist the report to a dashboard SQLite DB."),
     signing_key: Path | None = typer.Option(None, exists=True, dir_okay=False),
 ) -> None:
-    """Run a Python evaluation suite."""
-    agent, cases = _load_suite(suite)
+    """Run a Python suite or YAML scenarios against a declared target."""
+    adapter: AgentAdapter
+    if target is None:
+        if suite.is_dir() or suite.suffix != ".py":
+            raise typer.BadParameter("YAML scenarios require --target agenttrust-target.yml")
+        agent, cases = _load_suite(suite)
+        adapter = PlainPythonAdapter(agent)
+    else:
+        parsed_target = load_target(target)
+        adapter = create_adapter(parsed_target, target)
+        scenario_paths = discover_scenarios((suite,))
+        if not scenario_paths:
+            raise typer.BadParameter("no .yml or .yaml scenario files found")
+        cases = [
+            to_evaluation_case(expanded)
+            for path in scenario_paths
+            for expanded in expand_scenario(load_scenario(path).scenario)
+        ]
     if attacks:
         cases = [variant for case in cases for variant in (case, *attack_cases(case))]
     profiles = {"balanced": COMMUNITY_BALANCED, "high-impact": COMMUNITY_HIGH_IMPACT}
@@ -125,9 +160,7 @@ def run(
         raise typer.BadParameter("profile must be balanced or high-impact")
     selected_profile = profiles[profile]
     report = asyncio.run(
-        EvaluationEngine().evaluate(
-            PlainPythonAdapter(agent), cases, RunConfig(seed=seed, repetitions=repetitions)
-        )
+        EvaluationEngine().evaluate(adapter, cases, RunConfig(seed=seed, repetitions=repetitions))
     )
     write_json(report, json_report)
     write_html(report, html_report)

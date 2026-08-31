@@ -39,9 +39,10 @@ Create reviewable YAML scenarios without writing framework code:
 ```bash
 agenttrust init
 agenttrust validate scenarios/
+agenttrust run scenarios/ --target agenttrust-target.yml
 ```
 
-YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. Trace divergence produces structured missing, unexpected, reordered, duplicate and argument-level differences. See the [scenario guide](docs/scenarios.md).
+`init` creates a runnable plain-Python target as well as the scenario and schema. YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. Trace divergence produces structured missing, unexpected, reordered, duplicate and argument-level differences. See the [scenario guide](docs/scenarios.md).
 
 Launch the optional local evidence explorer:
 

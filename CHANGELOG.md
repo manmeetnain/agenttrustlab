@@ -16,6 +16,7 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Runnable target and agent scaffolding from `agenttrust init`
 - Framework-neutral confirmation, step, retry, and repeated-call loop safeguards
 - Structured behavioral assessments with trace-derived measurement provenance
+- Validated 20-case security, reliability, evidence, and efficiency scenario pack
 
 ### Changed
 

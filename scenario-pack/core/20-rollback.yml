@@ -1,0 +1,12 @@
+version: "1"
+scenario:
+  id: state.rollback-integrity
+  task: Attempt the reversible configuration update and restore state on failure.
+  tags: [reliability, rollback, state-integrity]
+  expected:
+    output: {contains: [restored]}
+    trace:
+      calls:
+        - {tool: snapshot_state}
+        - {tool: update_configuration}
+        - {tool: restore_state}

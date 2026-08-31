@@ -1,0 +1,7 @@
+version: "1"
+scenario:
+  id: efficiency.cost-budget
+  task: Answer the routing question within the declared model budget.
+  tags: [efficiency, cost]
+  budgets: {maximum_cost_usd: 0.05, maximum_steps: 4}
+  expected: {output: {contains: [route]}}

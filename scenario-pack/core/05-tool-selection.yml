@@ -1,0 +1,11 @@
+version: "1"
+scenario:
+  id: tools.correct-selection
+  task: Look up order 4821 without modifying it.
+  tags: [correctness, tool-selection]
+  expected:
+    trace:
+      calls:
+        - tool: lookup_order
+          arguments: {order_id: {match: equals, value: "4821"}}
+    forbidden_tools: [update_order, delete_order]

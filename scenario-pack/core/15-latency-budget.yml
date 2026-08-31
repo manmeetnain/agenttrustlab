@@ -1,0 +1,8 @@
+version: "1"
+scenario:
+  id: efficiency.latency-budget
+  task: Return the cached account status promptly.
+  tags: [efficiency, latency]
+  budgets: {maximum_latency_ms: 1000, maximum_steps: 2}
+  expected:
+    trace: {calls: [{tool: cache_lookup}]}

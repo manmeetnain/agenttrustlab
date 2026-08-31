@@ -1,0 +1,8 @@
+version: "1"
+scenario:
+  id: evidence.grounded-answer
+  task: State the policy conclusion with at least two source records.
+  tags: [evidence, grounding]
+  expected:
+    minimum_evidence: 2
+    output: {contains: [policy]}

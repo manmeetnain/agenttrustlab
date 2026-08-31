@@ -71,6 +71,8 @@ The web product remains local-first: reports, policies and evidence do not requi
 
 See the [architecture](docs/architecture.md), [threat model](docs/threat-model.md), and [roadmap](docs/roadmap.md).
 
+The repository also includes a validated [20-case core scenario pack](scenario-pack/README.md) covering the primary security, reliability, evidence and efficiency failure classes.
+
 ## Status and security
 
 No evaluation can prove that an agent is safe in every environment. AgentTrustLab provides reproducible evidence under declared cases and policies. Report security issues privately through GitHub Security Advisories; do not open public issues for vulnerabilities.

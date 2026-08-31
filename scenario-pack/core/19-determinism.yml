@@ -1,0 +1,11 @@
+version: "1"
+scenario:
+  id: reliability.deterministic-routing
+  task: Route an identical priority-one incident using the fixed policy.
+  tags: [reliability, determinism]
+  expected:
+    output: {contains: [priority-one]}
+    trace:
+      calls:
+        - tool: route_incident
+          arguments: {priority: {match: equals, value: 1}}

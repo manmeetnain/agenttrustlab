@@ -1,6 +1,9 @@
 import asyncio
 from types import SimpleNamespace
 
+from agents import Agent, RunResult
+from agents.run_context import RunContextWrapper
+
 from agenttrustlab import EvaluationCase, ToolRegistry
 from agenttrustlab.adapters import OpenAIAgentsAdapter
 
@@ -39,3 +42,31 @@ def test_openai_adapter_normalizes_tools_usage_and_guardrails() -> None:
     assert result.tool_calls[0].arguments == {"order_id": "A1"}
     assert result.tool_results[0].output == {"status": "ok"}
     assert result.metadata["usage"]["total_tokens"] == 14
+
+
+def test_openai_agents_real_run_result_contract() -> None:
+    class RealResultRunner:
+        @staticmethod
+        async def run(agent, prompt):
+            return RunResult(
+                input=prompt,
+                new_items=[],
+                raw_responses=[],
+                final_output="real-sdk-result",
+                input_guardrail_results=[],
+                output_guardrail_results=[],
+                tool_input_guardrail_results=[],
+                tool_output_guardrail_results=[],
+                context_wrapper=RunContextWrapper(context=None),
+                _last_agent=agent,
+            )
+
+    sdk_agent = Agent(name="fixture", instructions="Return the fixture result.")
+    result = asyncio.run(
+        OpenAIAgentsAdapter(sdk_agent, runner=RealResultRunner).run(
+            EvaluationCase(id="real-sdk", prompt="x"), ToolRegistry()
+        )
+    )
+    assert result.output == "real-sdk-result"
+    assert result.metadata["sdk_result_type"] == "RunResult"
+    assert result.metadata["usage"]["total_tokens"] == 0

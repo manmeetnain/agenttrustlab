@@ -1,6 +1,9 @@
 import asyncio
 from types import SimpleNamespace
 
+import pytest
+from mcp.types import CallToolResult, TextContent
+
 from agenttrustlab import EvaluationCase, ToolRegistry
 from agenttrustlab.conformance import check_adapter
 from agenttrustlab.framework_adapters import (
@@ -71,6 +74,42 @@ def test_mcp_adapter_and_conformance() -> None:
     assert result.output == "ready: x"
     assert result.metadata["is_error"] is False
     assert asyncio.run(check_adapter(adapter)) == ()
+
+
+def test_mcp_v2_result_normalizes_structured_evidence() -> None:
+    class V2Session:
+        async def call_tool(self, name, arguments):
+            return CallToolResult(
+                content=[TextContent(text="fallback")],
+                structuredContent={
+                    "output": "verified",
+                    "tool_calls": [{"id": "1", "name": "lookup", "arguments": {"id": "42"}}],
+                    "evidence": [{"source": "record:42", "content": "active"}],
+                },
+            )
+
+    result = asyncio.run(
+        MCPAdapter(V2Session(), tool_name="agent.run").run(
+            EvaluationCase(id="mcp-v2", prompt="x"), ToolRegistry()
+        )
+    )
+    assert result.output == "verified"
+    assert result.tool_calls[0].name == "lookup"
+    assert result.evidence[0].source == "record:42"
+    assert result.metadata["transport_result"] == "structured"
+
+
+def test_mcp_v2_error_becomes_engine_visible_exception() -> None:
+    class ErrorSession:
+        async def call_tool(self, name, arguments):
+            return CallToolResult(content=[TextContent(text="policy denied")], isError=True)
+
+    with pytest.raises(RuntimeError, match="policy denied"):
+        asyncio.run(
+            MCPAdapter(ErrorSession(), tool_name="agent.run").run(
+                EvaluationCase(id="mcp-error", prompt="x"), ToolRegistry()
+            )
+        )
 
 
 def test_remaining_framework_adapters_conform() -> None:

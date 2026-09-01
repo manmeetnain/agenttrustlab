@@ -92,6 +92,25 @@ class MCPAdapter:
         )
         if inspect.isawaitable(response):
             response = await response
+        if bool(getattr(response, "isError", getattr(response, "is_error", False))):
+            blocks = getattr(response, "content", ())
+            detail = "\n".join(_content(block) for block in blocks) or "MCP tool returned an error"
+            raise RuntimeError(detail)
+        structured = getattr(
+            response, "structuredContent", getattr(response, "structured_content", None)
+        )
+        if isinstance(structured, dict) and "output" in structured:
+            normalized = AgentResult.model_validate(structured)
+            return normalized.model_copy(
+                update={
+                    "metadata": {
+                        **normalized.metadata,
+                        "framework": "mcp",
+                        "tool_name": self.tool_name,
+                        "transport_result": "structured",
+                    }
+                }
+            )
         blocks = getattr(response, "content", ())
         output = "\n".join(_content(block) for block in blocks)
         return AgentResult(
@@ -99,7 +118,8 @@ class MCPAdapter:
             metadata={
                 "framework": "mcp",
                 "tool_name": self.tool_name,
-                "is_error": bool(getattr(response, "isError", False)),
+                "is_error": False,
+                "transport_result": "content",
             },
         )
 

@@ -10,7 +10,7 @@ Adapters translate framework behavior into `AgentResult`; they never decide whet
 | OpenAI Agents SDK | Conformant foundation | Output, tool calls/results, usage and guardrail metadata |
 | LangGraph | Experimental | Async graph input/output |
 | Pydantic AI | Experimental | Agent output and usage |
-| MCP | Experimental | Connected tool response blocks |
+| MCP | Conformant foundation | MCP v2 text/structured results and errors |
 | CrewAI | Experimental | Crew kickoff raw output |
 | AutoGen | Experimental | Final task message |
 | Google ADK | Experimental | Session-owned event text |
@@ -28,3 +28,9 @@ Adapters are duck typed so installing AgentTrustLab never installs an orchestrat
 4. **Benchmark-grade:** published reproducible benchmark usage.
 
 Framework-specific details remain metadata while portable policies consume stable contracts.
+
+## Launch-critical dependencies
+
+The `openai` extra is tested against the real `openai-agents>=0.22,<1` result contract. AgentTrustLab delegates orchestration to `Runner.run`, then normalizes final output, tool calls, tool results, usage, guardrail results and approval interruptions. Deterministic conformance does not call a paid model; live-model tests belong in credentialed, budget-limited integration suites.
+
+The `mcp` extra targets MCP Python SDK `>=2.1,<3`. It accepts standard text content and MCP v2 structured content. A structured payload shaped as an `AgentResult` preserves tool calls and evidence; protocol `isError` results become engine-visible errors rather than successful text. MCP v1 `FastMCP` examples are intentionally not presented as current v2 support.

@@ -18,6 +18,8 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - Structured behavioral assessments with trace-derived measurement provenance
 - Validated 20-case security, reliability, evidence, and efficiency scenario pack
 - JUnit XML, SARIF 2.1.0, and Markdown audit reports for CI and review workflows
+- Pinned real-dependency conformance for OpenAI Agents SDK 0.22+ and MCP Python SDK 2.1+
+- MCP v2 structured-result normalization and explicit protocol error propagation
 
 ### Changed
 

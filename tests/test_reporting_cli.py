@@ -135,3 +135,13 @@ def test_cli_validate_reports_invalid_file(tmp_path) -> None:
     result = CliRunner().invoke(app, ["validate", str(invalid)])
     assert result.exit_code == 1
     assert "ValidationError" in result.output
+
+
+def test_cli_installs_bundled_scenario_pack(tmp_path) -> None:
+    destination = tmp_path / "pack"
+    runner = CliRunner()
+    installed = runner.invoke(app, ["pack", str(destination)])
+    assert installed.exit_code == 0, installed.output
+    assert len(list(destination.glob("*.yml"))) == 20
+    collision = runner.invoke(app, ["pack", str(destination)])
+    assert collision.exit_code != 0

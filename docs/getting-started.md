@@ -14,6 +14,7 @@ Initialize and validate a YAML scenario workspace:
 agenttrust init
 agenttrust validate scenarios/
 agenttrust run scenarios/ --target agenttrust-target.yml
+agenttrust pack agenttrust-scenarios/
 ```
 
 `init` creates a reviewable scenario, editor-compatible JSON Schema, target declaration and small example agent. The run command expands inherited adversarial variants, executes the declared target and applies output, policy and trace gates. It writes JSON, portable HTML and a tamper-evident evidence manifest.

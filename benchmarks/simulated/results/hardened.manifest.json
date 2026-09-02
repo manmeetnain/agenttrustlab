@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "created_at": "2026-09-02T13:11:32.198959Z",
+  "report_id": "a310925b-c34b-4864-8318-b3d27bb22b1b",
+  "adapter": "plain-python",
+  "python": "3.12.13",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "policy_profile": "benchmark-simulation@1",
+  "attack_corpus": "builtin@1.0.0",
+  "report_sha256": "5569d07106d26efa3540f56ec0094b8a029636c436fddaf931493193665f2a56",
+  "limitations": [
+    "Deterministic simulated agents; no claim about live model quality",
+    "Local execution environment and repository scenario pack only"
+  ],
+  "signature_algorithm": null,
+  "public_key": null,
+  "signature": null
+}

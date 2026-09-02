@@ -103,6 +103,8 @@ Status: JSON, HTML, JUnit XML, SARIF 2.1.0, Markdown, signed evidence and the lo
 - Findings article and 90-second demonstration
 - Five targeted design-partner or paid-audit conversations
 
+Status: the credential-free simulated benchmark, raw evidence, methodology, findings article, demo script and outreach kit are shipped. A recognizable external MCP target and real outreach conversations remain post-publication validation work.
+
 ## Release strategy
 
 - **v0.1.0 — Foundation:** soft PyPI release of the stable verification kernel.

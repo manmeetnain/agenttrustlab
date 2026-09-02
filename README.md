@@ -40,6 +40,7 @@ Create reviewable YAML scenarios without writing framework code:
 agenttrust init
 agenttrust validate scenarios/
 agenttrust run scenarios/ --target agenttrust-target.yml
+agenttrust pack agenttrust-scenarios/
 ```
 
 `init` creates a runnable plain-Python target as well as the scenario and schema. YAML contract version 1 includes expected output, ordered or unordered tool traces, explicit argument matchers, execution budgets and inherited adversarial variants. Trace divergence produces structured missing, unexpected, reordered, duplicate and argument-level differences. See the [scenario guide](docs/scenarios.md).
@@ -72,6 +73,16 @@ The web product remains local-first: reports, policies and evidence do not requi
 See the [architecture](docs/architecture.md), [threat model](docs/threat-model.md), and [roadmap](docs/roadmap.md).
 
 The repository also includes a validated [20-case core scenario pack](scenario-pack/README.md) covering the primary security, reliability, evidence and efficiency failure classes.
+
+## Reproducible benchmark
+
+Run the credential-free vulnerable-versus-hardened comparison:
+
+```bash
+python -m benchmarks.simulated.run
+```
+
+The same 30 expanded cases run twice per fixture. The published result is **0/60 passes for the intentionally vulnerable agent and 60/60 for the hardened agent**, with raw JSON, HTML, JUnit, SARIF, Markdown and evidence manifests under [`benchmarks/simulated/results`](benchmarks/simulated/results). See the [benchmark methodology](docs/benchmark.md) and [launch findings](launch/FINDINGS.md).
 
 ## Status and security
 

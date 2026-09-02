@@ -8,6 +8,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from agenttrustlab.contracts import EvaluationReport, RunStatus
+from agenttrustlab.remediation import remediation_for
 
 
 def write_json(report: EvaluationReport, path: str | Path) -> Path:
@@ -86,6 +87,7 @@ def write_sarif(report: EvaluationReport, path: str | Path) -> Path:
                     "caseId": run.case_id,
                     "score": run.score.total if run.score else None,
                     "adapter": report.adapter,
+                    "remediation": remediation_for(_finding(run)).guidance,
                 },
             }
         )
@@ -121,16 +123,18 @@ def write_markdown(report: EvaluationReport, path: str | Path) -> Path:
         f"- Cases: {len(report.runs)} ({passed} passed, {len(report.runs) - passed} failed)",
         f"- Deterministic: {'yes' if report.deterministic else 'no'}",
         "",
-        "| Case | Status | Score | Latency | Finding |",
-        "|---|---:|---:|---:|---|",
+        "| Case | Status | Score | Severity | Finding | Remediation |",
+        "|---|---:|---:|---:|---|---|",
     ]
     for run in report.runs:
         finding = _finding(run) if run.status != RunStatus.PASSED else "—"
         finding = finding.replace("|", "\\|").replace("\n", " ")
         score = f"{run.score.total:.0%}" if run.score else "—"
+        remediation = remediation_for(finding)
         lines.append(
             f"| `{run.case_id}` | {run.status.value} | {score} | "
-            f"{run.latency_ms:.1f} ms | {finding} |"
+            f"{remediation.severity if run.status != RunStatus.PASSED else '—'} | {finding} | "
+            f"{remediation.guidance if run.status != RunStatus.PASSED else '—'} |"
         )
     target = Path(path)
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")

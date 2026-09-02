@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import json
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +46,13 @@ from agenttrustlab.verdicts import GateStatus, evaluate_release
 
 app = typer.Typer(help="Independent verification for AI agents.", no_args_is_help=True)
 console = Console()
+
+
+def _scenario_pack_source() -> Traversable:
+    packaged = files("agenttrustlab").joinpath("scenario_pack")
+    if packaged.is_dir():
+        return packaged
+    return Path(__file__).parents[2] / "scenario-pack" / "core"
 
 
 def _load_suite(path: Path) -> tuple[Any, list[EvaluationCase]]:
@@ -116,6 +125,27 @@ def write_scenario_schema(
     """Write the versioned scenario JSON Schema."""
     output.write_text(json.dumps(scenario_json_schema(), indent=2) + "\n", encoding="utf-8")
     console.print(f"Created {output}")
+
+
+@app.command("pack")
+def install_scenario_pack(
+    directory: Path = typer.Argument(Path("agenttrust-scenarios"), file_okay=False),
+) -> None:
+    """Copy the bundled 20-case core scenario pack into a project."""
+    source = _scenario_pack_source()
+    entries = sorted(
+        (entry for entry in source.iterdir() if entry.name.endswith((".yml", ".yaml"))),
+        key=lambda entry: entry.name,
+    )
+    if not entries:
+        raise typer.BadParameter("bundled scenario pack is unavailable")
+    collisions = [directory / entry.name for entry in entries if (directory / entry.name).exists()]
+    if collisions:
+        raise typer.BadParameter(f"refusing to overwrite existing files: {collisions[0]}")
+    directory.mkdir(parents=True, exist_ok=True)
+    for entry in entries:
+        (directory / entry.name).write_text(entry.read_text(encoding="utf-8"), encoding="utf-8")
+    console.print(f"Installed {len(entries)} scenarios in {directory}")
 
 
 @app.command()

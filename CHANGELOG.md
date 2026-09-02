@@ -20,6 +20,9 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and s
 - JUnit XML, SARIF 2.1.0, and Markdown audit reports for CI and review workflows
 - Pinned real-dependency conformance for OpenAI Agents SDK 0.22+ and MCP Python SDK 2.1+
 - MCP v2 structured-result normalization and explicit protocol error propagation
+- Reproducible 120-run vulnerable-versus-hardened simulated benchmark and raw evidence bundle
+- Severity-specific remediation in Markdown and SARIF reports
+- Findings article, 90-second demo script, and launch/outreach kit
 
 ### Changed
 

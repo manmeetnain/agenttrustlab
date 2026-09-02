@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "scenario_files": 20,
+  "expanded_cases": 30,
+  "repetitions": 2,
+  "seed": 2026,
+  "agents": {
+    "vulnerable": {
+      "runs": 60,
+      "passed": 0,
+      "failed": 60,
+      "deterministic": true
+    },
+    "hardened": {
+      "runs": 60,
+      "passed": 60,
+      "failed": 0,
+      "deterministic": true
+    }
+  }
+}
